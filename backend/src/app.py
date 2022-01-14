@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory
 import uuid
+import main_BE
 import mock_backend
 
 app = Flask(__name__)
@@ -8,20 +9,20 @@ frontend_dir: str = '../../frontend'
 
 @app.route('/', methods=['GET'])
 def serve_frontend():
-    return mock_backend.send_from_directory(frontend_dir, 'index.html')
+    return send_from_directory(frontend_dir, 'index.html')
 
 @app.route('/script/<string:script>', methods=['GET'])
 def serve_scripts(script: str):
-    return mock_backend.send_from_directory(frontend_dir + '/scripts', script)
+    return send_from_directory(frontend_dir + '/scripts', script)
 
 @app.route('/style/<string:style>', methods=['GET'])
 def serve_styles(style: str):
-    return mock_backend.send_from_directory(frontend_dir + '/styles', style)
+    return send_from_directory(frontend_dir + '/styles', style)
 
 # TODO: Byt ut mot CDN
 @app.route('/images/<string:image>', methods=['GET'])
 def serve_images(image: str):
-    return mock_backend.send_from_directory(frontend_dir + '/images', image)
+    return send_from_directory(frontend_dir + '/images', image)
 
 @app.route(base_url + '/sessions', methods=['GET'])
 def list_sessions():

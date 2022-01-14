@@ -1,4 +1,9 @@
 .DS_Store
+*backup
 frontend/images/*.jpg
 frontend/images/dummy*
-
+backend/venv/
+backend/src/__pychache__/
+backend/src/session_data/
+backend/src/data/
+*.pyc

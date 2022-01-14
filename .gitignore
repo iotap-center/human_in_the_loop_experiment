@@ -1,2 +1,4 @@
 .DS_Store
+frontend/images/*.jpg
+frontend/images/dummy*
 

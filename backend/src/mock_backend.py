@@ -39,6 +39,10 @@ def create_session():
                 'href': base_url + '/sessions/' + str(session),
                 'method': 'GET'
             },
+            'steps': {
+                'href': base_url + '/sessions/' + str(session) + '/steps',
+                'method': 'GET'
+            },
             'first': {
                 'href': base_url + '/sessions/' + str(session) + '/steps/1',
                 'method': 'GET'

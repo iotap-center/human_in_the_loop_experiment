@@ -10,13 +10,14 @@ import glob
 import time
 import utils as utils
 import pickle
+import uuid
 
-def create_session_id():
+def create_session_id() -> uuid:
 
     #generate unique session ID
-    return utils.generate_session_id()
+    return uuid.uuid4()
 
-def create_session_data(session_id, session_step, n):
+def create_session_data(session_id: uuid, session_step: int, n: int) -> None:
 
     #generate and save n classifiers, iamge orders and result lists
     for subsession_id in range(n):
@@ -39,9 +40,7 @@ def create_session_data(session_id, session_step, n):
         filename = utils.create_filename(session_id, session_step, subsession_id, 'results')
         pickle.dump(results, open(filename, 'wb'))
 
-    return
-
-def classify(session_id, session_step, subsession_id):
+def classify(session_id: uuid, session_step: int, subsession_id: int) -> tuple:
     #load correct model
     filename = utils.create_filename(session_id, session_step, subsession_id, 'model')
     model = pickle.load(open(filename, 'rb'))
@@ -55,7 +54,14 @@ def classify(session_id, session_step, subsession_id):
 
     return im_id, y_true, pred
 
-def save_and_update(session_id, session_step, subsession, im_id, y_true, pred, user_input):
+def save_and_update(
+        session_id: uuid,
+        session_step: int,
+        subsession: int,
+        im_id: int,
+        y_true: bool,
+        pred: int,
+        user_input: int) -> None:
     #load correct model
     filename = utils.create_filename(session_id, session_step, subsession, 'model')
     model = pickle.load(open(filename, 'rb'))

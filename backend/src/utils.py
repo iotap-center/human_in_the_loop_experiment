@@ -1,4 +1,3 @@
-from nanoid import generate
 import pickle
 import random
 
@@ -12,11 +11,6 @@ session_path = 'session_data/'
 
 # Path to folder were all results are stored
 results_path = 'results/'
-
-#generate unique ID for session
-def generate_session_id():
-    session_id = generate()
-    return session_id
 
 def create_filename(session_id, session_step, i, object_type):
 

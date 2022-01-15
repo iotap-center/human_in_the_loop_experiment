@@ -9,20 +9,25 @@ def list_sessions():
         'sessions': [
             {
                 'session': '16fd2706-8baf-433b-82eb-8c7fada847da',
-                'uri': base_url + '/sessions/16fd2706-8baf-433b-82eb-8c7fada847da'
+                'href': base_url + '/sessions/16fd2706-8baf-433b-82eb-8c7fada847da',
+                'method': 'GET'
             }
         ],
         'links': {
             'self': {
-                'href': base_url + '/sessions/',
+                'href': base_url + '/sessions',
                 'method': 'GET'
             },
             'first': {
                 'href': base_url + '/sessions/16fd2706-8baf-433b-82eb-8c7fada847da',
                 'method': 'GET'
             },
+            'last': {
+                'href': base_url + '/sessions/16fd2706-8baf-433b-82eb-8c7fada847da',
+                'method': 'GET'
+            },
             'create': {
-                'href': base_url + '/sessions/',
+                'href': base_url + '/sessions',
                 'method': 'POST'
             }
         }

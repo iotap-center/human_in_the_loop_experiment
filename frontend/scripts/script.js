@@ -127,12 +127,11 @@ const repeatColumns = function (columns) {
 };
 
 const calculateColumns = function (images) {
-  if (images.length < 5) {
-    return 2;
-  } else if (images.length < 10) {
-    return 3;
+  // Due to new layout stuff, this will mostly return 3. Remove later!
+  if (images.length == 1) {
+    return 1;
   }
-  return 4;
+  return 3;
 }
 
 const clearImages = function () {

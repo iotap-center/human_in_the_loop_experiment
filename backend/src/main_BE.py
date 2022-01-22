@@ -5,6 +5,8 @@ from creme.preprocessing import StandardScaler
 from creme.compose import Pipeline
 from creme.metrics import Accuracy
 from creme import stream
+from mock_storage import Storage
+from session import Session, Subsession, Strategy, Stream
 import numpy as np
 import glob
 import time
@@ -12,71 +14,124 @@ import utils as utils
 import pickle
 import uuid
 
-def create_session_id() -> uuid:
+storage: Storage = Storage()
 
-    #generate unique session ID
+def create_session() -> Session:
+    """
+    """
+    nbr_of_steps: int = 4
+    nbr_of_images: int = 30
+
+    # Setting up the data structure
+    session: Session = Session(create_session_id(), nbr_of_steps)
+    
+    # Step 1
+    session.add_subsession(0, create_subsession(session, 0, Strategy.MT, 1, nbr_of_images));
+    session.add_subsession(0, create_subsession(session, 0, Strategy.ALMT, 1, nbr_of_images));
+    
+    # Step 2
+    session.add_subsession(1, create_subsession(session, 1, Strategy.MT, 3, nbr_of_images));
+    session.add_subsession(1, create_subsession(session, 1, Strategy.ALMT, 3, nbr_of_images));
+    
+    # Step 3
+    session.add_subsession(2, create_subsession(session, 2, Strategy.MT, 6, nbr_of_images));
+    session.add_subsession(2, create_subsession(session, 2, Strategy.ALMT, 6, nbr_of_images));
+    
+    # Step 4
+    session.add_subsession(3, create_subsession(session, 3, Strategy.MT, 9, nbr_of_images));
+    session.add_subsession(3, create_subsession(session, 3, Strategy.ALMT, 9, nbr_of_images));
+    
+    return session
+
+def create_session_id() -> uuid:
+    """
+    Generate unique session ID
+    """
     return uuid.uuid4()
 
-def create_session_data(session_id: uuid, session_step: int, n: int) -> None:
-
-    #generate and save n classifiers, iamge orders and result lists
-    for subsession_id in range(n):
+def create_subsession(
+        session: Session,
+        session_step: int,
+        strategy: Strategy,
+        number_of_streams: int,
+        nbr_of_images: int) -> Subsession:
+    """
+    """
+    subsession: Subsession = Subsession(session_step, session, strategy, number_of_streams, nbr_of_images)
+    
+    #generate and save number_of_streams classifiers, image orders and result lists
+    for stream_id in range(number_of_streams):
         model = Pipeline(
             StandardScaler(),
-            OneVsRestClassifier(classifier=LogisticRegression())
-        )
-        filename = utils.create_filename(session_id, session_step, subsession_id, 'model')
-        pickle.dump(model, open(filename, 'wb'))
+            OneVsRestClassifier(classifier=LogisticRegression()))
+        stream = Stream(nbr_of_images)
+        stream.set_images(utils.shuffle_im_order(nbr_of_images))
+        stream.set_model(model)
+        subsession.set_stream(stream_id, stream)
 
-        im_order = utils.shuffle_im_order()
-        filename = utils.create_filename(session_id, session_step, subsession_id, 'im_order')
-        pickle.dump(im_order, open(filename, 'wb'))
+        if strategy == Strategy.ALMT:
+            subsession.set_parameters([1, 0.05])
+        model = None
 
-        im_index = 0
-        filename = utils.create_filename(session_id, session_step, subsession_id, 'im_index')
-        pickle.dump(im_index, open(filename, 'wb'))
+    return subsession
 
-        results = []
-        filename = utils.create_filename(session_id, session_step, subsession_id, 'results')
-        pickle.dump(results, open(filename, 'wb'))
-
-def classify(session_id: uuid, session_step: int, subsession_id: int) -> tuple:
+def classify(
+        subsession: Subsession,
+        stream_id: int,
+        subsession_step: int) -> tuple:
+    """
+    """
     #load correct model
-    filename = utils.create_filename(session_id, session_step, subsession_id, 'model')
-    model = pickle.load(open(filename, 'rb'))
+    model = subsession.get_stream(stream_id).get_model()
 
     #load image data and get next image ID
-    im_id = utils.next_im_id(session_id, session_step, subsession_id)
-    data_sample, y_true = utils.load_data_sample(im_id)
+    images = subsession.get_stream(stream_id).get_images()
+    image_id = images[subsession_step]
+    data_sample, y_true = utils.load_data_sample(image_id)
 
     #classify the image
-    pred = model.predict_one(data_sample)
+    prediction = model.predict_one(data_sample)
+    subsession.get_stream(stream_id).set_prediction(image_id, prediction)
 
-    return im_id, y_true, pred
+    #check if image should be shown to user
+    if subsession.get_strategy() == Strategy.ALMT:
+        query, parameters = utils.AL_uncertainty(
+            subsession.get_stream(stream_id).get_model(),
+            subsession.get_parameters(),
+            data_sample,
+            prediction)
+        subsession.set_parameters(parameters)
+    elif subsession.get_strategy() == Strategy.MT:
+        query = True
 
-def save_and_update(
-        session_id: uuid,
-        session_step: int,
-        subsession: int,
-        im_id: int,
-        y_true: bool,
-        pred: int,
-        user_input: int) -> None:
-    #load correct model
-    filename = utils.create_filename(session_id, session_step, subsession, 'model')
-    model = pickle.load(open(filename, 'rb'))
+    return image_id, y_true, prediction, query
 
-    #update and save model
-    data_sample, y_true = utils.load_data_sample(im_id)
-    model = model.fit_one(data_sample, user_input)
-    pickle.dump(model, open(filename, 'wb'))
+def update(
+        subsession: Subsession,
+        #session_step: int,
+        stream_id: int,
+        image_id: str,
+        y_true: int,
+        prediction: int,
+        user_input: int,
+        query: bool) -> Subsession:
+    """
+    """
+    if query:
+        # load correct model
+        model = subsession.get_stream(stream_id).get_model()
 
-    #update result data
-    filename = utils.create_filename(session_id, session_step, subsession, 'results')
-    results = pickle.load(open(filename, 'rb'))
-    results.append([im_id, y_true, pred, user_input]) #add time????
-    pickle.dump(results, open(filename, 'wb'))
+        # update and save model
+        data_sample, y_true = utils.load_data_sample(image_id)
+        model = model.fit_one(data_sample, user_input)
+        subsession.get_stream(stream_id).set_model(model)
 
-    return
+    # update result data
+    # add time????
+    subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input, query])
 
+    return subsession
 
+def save(self, subsession: Subsession) -> None:
+    filename = utils.create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'result')
+    pickle.dump(subsession.serialize(), open(filename, 'wb'))

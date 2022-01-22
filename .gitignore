@@ -6,4 +6,5 @@ backend/venv/
 backend/src/__pychache__/
 backend/src/session_data/
 backend/src/data/
+backend/src/results/
 *.pyc

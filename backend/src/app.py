@@ -267,6 +267,7 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
             'stream': index + 1,
             'image': image,
             'classification': classification[1],
+            'labels': ['katt', 'hund'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': classification[3]
         }
@@ -335,12 +336,12 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
             sample[1],
             subsession.get_stream(index).get_prediction(image),
             images[image]['classification'],
-            images[image]['query'])
-        print(classification)
+            bool(images[image]['query']))
         item = {
             'stream': index + 1,
             'image': image,
             'classification': classification[1],
+            'labels': ['katt', 'hund'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': classification[3]
         }

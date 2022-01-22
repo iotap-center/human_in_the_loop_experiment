@@ -180,7 +180,6 @@ def get_subsession_step(session: uuid, step: int, subsession: int, substep: int)
                 'stream': 1,
                 'image': 'dummy.cat.jpg',
                 'labels': ['katt', 'hund'],
-                'prediction': 0,
                 'classification': -1,
                 'image_url': '/images/dummy.cat.jpg'
             },
@@ -188,7 +187,6 @@ def get_subsession_step(session: uuid, step: int, subsession: int, substep: int)
                 'stream': 2,
                 'image': 'dummy.ball.jpg',
                 'labels': ['puck', 'boll'],
-                'prediction': 1,
                 'classification': -1,
                 'image_url': '/images/dummy.ball.png'
             },
@@ -196,7 +194,6 @@ def get_subsession_step(session: uuid, step: int, subsession: int, substep: int)
                 'stream': 3,
                 'image': 'dummy.apple.jpg',
                 'labels': ['äpple', 'banan'],
-                'prediction': 0,
                 'classification': -1,
                 'image_url': '/images/dummy.apple.jpg'
             },
@@ -204,7 +201,6 @@ def get_subsession_step(session: uuid, step: int, subsession: int, substep: int)
                 'stream': 4,
                 'image': 'dummy.bat.jpg',
                 'labels': ['fladdermus', 'tjuv'],
-                'prediction': 1,
                 'classification': -1,
                 'image_url': '/images/dummy.bat.jpg'
             }
@@ -247,7 +243,6 @@ def update_subsession_step(session: uuid, step: int):
                 'stream': 1,
                 'image': 'dummy.cat.jpg',
                 'labels': ['katt', 'hund'],
-                'prediction': 0,
                 'classification': 0,
                 'image_url': '/images/dummy.cat.jpg'
             },
@@ -255,7 +250,6 @@ def update_subsession_step(session: uuid, step: int):
                 'stream': 2,
                 'image': 'dummy.ball.jpg',
                 'labels': ['puck', 'boll'],
-                'prediction': 1,
                 'classification': 1,
                 'image_url': '/images/dummy.ball.png'
             },
@@ -263,7 +257,6 @@ def update_subsession_step(session: uuid, step: int):
                 'stream': 3,
                 'image': 'dummy.apple.jpg',
                 'labels': ['äpple', 'banan'],
-                'prediction': 0,
                 'classification': 0,
                 'image_url': '/images/dummy.apple.jpg'
             },
@@ -271,7 +264,6 @@ def update_subsession_step(session: uuid, step: int):
                 'stream': 4,
                 'image': 'dummy.bat.jpg',
                 'labels': ['fladdermus', 'tjuv'],
-                'prediction': 1,
                 'classification': 0,
                 'image_url': '/images/dummy.bat.jpg'
             }

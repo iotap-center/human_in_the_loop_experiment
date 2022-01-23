@@ -1,6 +1,12 @@
-.grid-container {
+grid-container {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto;
+  padding: 5px;
+}
+
+#wrapper.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   padding: 10px;
 }
 
@@ -11,11 +17,20 @@
   text-align: center;
 }
 
-.grid-item img {
-  width: 100%;
+.image-container {
+  height: 200px;
 }
 
-.image-container {
-  height: 350px;
-  overflow: hidden;
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+fieldset {
+  padding: 2px;
+}
+
+.ui-checkboxradio-label {
+  width: 30%;
 }

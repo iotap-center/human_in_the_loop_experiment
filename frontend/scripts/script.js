@@ -1,11 +1,15 @@
-const duration = 5000;
+let duration = 5000;
 let timer = null;
 
 // Setup
 $( function() {
   createNewSession()
+    .then(fetchSteps)
     .then(fetchStep)
-    .then(presentStep);
+    .then(fetchSubsession)
+    .then(fetchSubsessionStep)
+    .then(presentSubsessionStep)
+    .then(prepareNextStep);
 } );
 
 const createNewSession = function () {
@@ -14,7 +18,7 @@ const createNewSession = function () {
       url: '/api/v1/sessions',
       method: 'post',
       success: function (data) {
-        resolve(data.links.first);
+        resolve(data.links.self);
       },
       error: function (error) {
         reject(error);
@@ -23,11 +27,56 @@ const createNewSession = function () {
   })
 };
 
+const fetchSteps = function (link) {
+  return new Promise( (resolve, reject) => {
+    $.ajax({
+      url: link.href,
+      method: link.method,
+      success: function (data) {
+        resolve(data.links.first);
+      },
+      error: function (error) {
+        reject(error);
+      }
+    });
+  });
+};
+
 const fetchStep = function (link) {
   return new Promise( (resolve, reject) => {
     $.ajax({
       url: link.href,
-      metod: link.method,
+      method: link.method,
+      success: function (data) {
+        resolve(data.subsessions[0]);
+      },
+      error: function (error) {
+        reject(error);
+      }
+    });
+  });
+};
+
+const fetchSubsession = function (link) {
+  return new Promise( (resolve, reject) => {
+    $.ajax({
+      url: link.href,
+      method: link.method,
+      success: function (data) {
+        resolve(data.subsession_steps[0]);
+      },
+      error: function (error) {
+        reject(error);
+      }
+    });
+  });
+};
+
+const fetchSubsessionStep = function (link) {
+  return new Promise( (resolve, reject) => {
+    $.ajax({
+      url: link.href,
+      method: link.method,
       success: function (data) {
         resolve(data);
       },
@@ -38,16 +87,13 @@ const fetchStep = function (link) {
   });
 };
 
-const putStep = function (compilation, link) {
+const justFetch = function (link) {
   return new Promise( (resolve, reject) => {
     $.ajax({
       url: link.href,
       method: link.method,
-      data: JSON.stringify(compilation),
-      contentType: "application/json",
-      dataType: "json",
       success: function (data) {
-        resolve(data.links.next);
+        resolve(data);
       },
       error: function (error) {
         reject(error);
@@ -56,8 +102,54 @@ const putStep = function (compilation, link) {
   });
 };
 
+const prepareNextStep = async function (data) {
+  //startTimer(data.timeout * 1000);
+  if (data.links.next) {
+      putSubsessionStep(compileResponses(), data.links.update)
+        .then(data => fetchSubsessionStep(data.links.next))
+        .then(presentSubsessionStep)
+        .then(prepareNextStep);
+  } else if (data.links.next_subsession) {
+    putSubsessionStep(compileResponses(), data.links.update)
+      .then(data => fetchSubsession(data.links.next_subsession))
+      .then(fetchSubsessionStep)
+      .then(presentSubsessionStep)
+      .then(prepareNextStep);
+  } else {
+  }
+};
+
+const putSubsessionStep = function (compilation, link) {
+  return new Promise( (resolve, reject) => {
+    $.ajax({
+      url: link.href,
+      method: link.method,
+      data: JSON.stringify(compilation),
+      contentType: "application/json",
+      dataType: "json",
+      success: function (data) {
+        resolve(data);
+      },
+      error: function (error) {
+        reject(error);
+      }
+    });
+  });
+};
+
+const presentSubsessionStep = function (data) {
+  return new Promise( (resolve, reject) => {
+    setupForm(data);
+    clearImages();
+    addImages(data.images);
+    themeRadioButtons();
+    resolve(data);
+  });
+};
+
 const compileResponses = function () {
   const fieldsets = document.getElementsByTagName("fieldset");
+  const form = document.getElementById('step_data');
   const compilation = {};
   const items = [];
   
@@ -70,8 +162,9 @@ const compileResponses = function () {
 
 const buildResponseItem = function (fieldset) {
   const item = {};
-  item.image = fieldset.elements[1].value;
-  item.subsession = fieldset.elements[0].value;
+  item.image = fieldset.elements[0].value;
+  item.stream = fieldset.elements[1].value;
+  item.query = fieldset.elements[2].value == "true" ? true : false;
   item.classification = -1;
   
   for (let i = 2; i < fieldset.elements.length; i++) {
@@ -84,8 +177,14 @@ const buildResponseItem = function (fieldset) {
   return item;
 };
 
-const justLog = function (data) {
-  console.log(data);
+const justLog = function (data, message = false) {
+  return new Promise( (resolve, reject) => {
+    if (message) {
+      console.log(message);
+    }
+    console.log(data);
+    resolve(data);
+  });
 };
 
 const startTimer = function (update) {
@@ -95,19 +194,7 @@ const startTimer = function (update) {
 const tick = function (update) {
   return function() {
     clearTimeout(timer);
-    putStep(compileResponses(), update)
-      .then(fetchStep)
-      .then(presentStep)
-      .catch(justLog);
   };
-};
-
-const presentStep = function (data) {
-  startTimer(data.links.update);
-  clearImages();
-  addImages(data.images);
-  setColumns(calculateColumns(data.images));
-  themeRadioButtons();
 };
 
 const themeRadioButtons = function () {
@@ -116,23 +203,23 @@ const themeRadioButtons = function () {
   });
 };
 
-const setColumns = function (columns) {
-  if (Number.isInteger(columns)) {
-    $("#wrapper").css("grid-template-columns", repeatColumns(columns));
-  }
+const setupForm = function (data) {
+  const form = document.getElementById("step_data");
+  form.innerHTML = "";
+  
+  form.appendChild(createHiddenInput("session", data.session));
+  form.appendChild(createHiddenInput("step", data.step));
+  form.appendChild(createHiddenInput("subsession", data.subsession));
+  form.appendChild(createHiddenInput("subsession_step", data.subsession_step));
 };
 
-const repeatColumns = function (columns) {
-  return "auto ".repeat(columns).trim();
+const createHiddenInput = function (name, value) {
+  const element = document.createElement("input");
+  element.setAttribute("type", "hidden");
+  element.setAttribute("name", name);
+  element.setAttribute("value", value);
+  return element;
 };
-
-const calculateColumns = function (images) {
-  // Due to new layout stuff, this will mostly return 3. Remove later!
-  if (images.length == 1) {
-    return 1;
-  }
-  return 3;
-}
 
 const clearImages = function () {
   document.getElementById("wrapper").innerHTML = "";
@@ -141,12 +228,12 @@ const clearImages = function () {
 const addImages = function (images) {
   for (let i = 0; i < images.length; i++) {
     let image = images[i];
-    addImage(image.image_url, image.image, image.subsession, image.prediction, image.labels);
+    addImage(image.image_url, image.image, image.stream, image.classification, image.labels, image.query);
   }
 };
 
-const addImage = function (imageURL, image, subsession, prediction, classes) {
-  const name = "radio-" + subsession;
+const addImage = function (imageURL, image, stream, prediction, classes, query) {
+  const name = "radio-" + stream;
   const wrapper = document.getElementById("wrapper");
   
   const rootDiv = document.createElement("div");
@@ -163,20 +250,11 @@ const addImage = function (imageURL, image, subsession, prediction, classes) {
   
   const fieldset = document.createElement("fieldset");
   fieldset.classList.add("grid-container");
-  fieldset.style.gridTemplateColumns = repeatColumns(classes.length);
   rootDiv.appendChild(fieldset);
   
-  const subsessionField = document.createElement("input");
-  subsessionField.setAttribute("type", "hidden");
-  subsessionField.setAttribute("name", "subsession");
-  subsessionField.setAttribute("value", subsession);
-  fieldset.appendChild(subsessionField);
-  
-  const imageField = document.createElement("input");
-  imageField.setAttribute("type", "hidden");
-  imageField.setAttribute("name", "image");
-  imageField.setAttribute("value", image);
-  fieldset.appendChild(imageField);
+  fieldset.appendChild(createHiddenInput("image", image));
+  fieldset.appendChild(createHiddenInput("stream", stream));
+  fieldset.appendChild(createHiddenInput("query", query));
   
   for (let i = 0; i < classes.length; i++) {
     let label = document.createElement("label");

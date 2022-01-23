@@ -1,68 +1,124 @@
 from enum import Enum
+from creme.compose import Pipeline
 import uuid
 
-# This is an ugly hack used to  satisfy some dependencies
+# This is an ugly hack used to  satisfy some internal dependencies
 Session = type('Session', (object,), {})
 Subsession = type('Session', (object,), {})
 
 class Strategy(Enum):
-    """
+    """This enum class represents the available strategies used in the
+    experiment. We use enums to mitigate errors stemming from hard coded
+    string values.
     """
     
     MT: str = 'MT'
     ALMT: str = 'ALMT'
 
 class Stream:
-    """
+    """A stream represents a sequence of images, coupled with their predictions
+    (when calculated), and the results from a user interaction. Each stream
+    adheres to a single model.
     """
     
     def __init__(self, size: int) -> None:
-        """
+        """Initializes a stream of size elements.
+        
+        Keyword arguments:
+        size -- The number of images that this stream will contain
         """
         self.__model = None
         self.__images: list = [None] * size
         self.__predictions: dict = dict()
         self.__results: dict = dict()
 
-    def set_model(self, model) -> None:
+    def set_model(self, model: Pipeline) -> None:
+        """Sets the model used by this stream.
+        
+        Keyword arguments:
+        model -- The model is a Creme pipeline.
+        """
         self.__model = model
 
-    def get_model(self):
+    def get_model(self) -> Pipeline:
         return self.__model
 
     def set_images(self, images: list) -> None:
+        """Sets a sorted list of images. Useful for e.g. batches from util's
+        image randomizer.
+        
+        Keyword arguments:
+        images -- A list of strings, each being the name of an image file.
+        """
         self.__images = images
 
     def get_images(self) -> list:
         return self.__images
 
     def get_image(self, index: int) -> str:
+        """Returns a single image from the stream.
+        
+        Keyword arguments:
+        index -- The position of the image we want to know. The index starts at 0.
+        """
         try:
             return self.__images[index]
         except:
             return None
 
     def set_prediction(self, image_id: str, prediction: int) -> None:
+        """Sets the prediction made for an image.
+        
+        Keyword arguments:
+        image_id -- The name of the image.
+        prediction -- The prediction made by a classifier.
+        """
         self.__predictions[image_id] = prediction
 
     def get_prediction(self, image_id: str) -> int:
+        """Returns the prediction for an image.
+        
+        Keyword arguments:
+        image_id -- The name of the image we're interested in.
+        """
         try:
             return self.__predictions[image_id]
         except:
             return -1
         
-    def set_result(self, result: list) -> None:
+    def add_result(self, result: list) -> None:
+        """Adds the results from a user interaction.
+        
+        Keyword arguments:
+        result -- a list on the form
+                [image_id: str,
+                 y_true: int,
+                 prediction: int,
+                 user_input: int,
+                 query: bool]
+        """
         self.__results[list[0]] = result
 
-    def set_results(self, results: list) -> None:
+    def set_results(self, results: dict) -> None:
+        """Sets a complete list of results. Useful for e.g. deserialization.
+        
+        Keyword arguments:
+        results -- a dictionary of values as described in add_value(list).
+        """
         self.__results = results
 
     def get_results(self) -> dict:
+        """Returns the complete results dictionary."""
         return self.__results
 
-    def get_result(self, index: int) -> list:
+    def get_result(self, image_id: str) -> list:
+        """Returns a single result.
+        
+        Keyword arguments:
+        image_id - The name of an image
+        """
         try:
-            return self.__results[index]
+            return self.__results[image_id]
         except:
             return None
 
@@ -70,7 +126,8 @@ class Stream:
         return len(self.__images)
 
 class Subsession:
-    """
+    """Represents a subsession, i.e., a set of image streams sharing a common
+    strategy. A subsession belongs to a session step.
     """
     
     def __init__(self,
@@ -79,7 +136,14 @@ class Subsession:
             strategy: Strategy,
             nbr_of_streams: int,
             nbr_of_slots: int) -> None:
-        """
+        """Initializes a new subsession.
+        
+        Keyword arguments:
+        session_step -- The session step that this subsession belongs to
+        session -- The session that this subsession belongs to
+        strategy -- The strategy used to predict the image contents in this subsession
+        nbr_of_streams -- The number of streams that will be used in in this subsession
+        nbr_of_slots -- The number of images used in the streams
         """
         self.__session_step: int = session_step
         self.__session: Session = session
@@ -96,18 +160,34 @@ class Subsession:
         return self.__strategy
 
     def set_session(self, session: Session) -> None:
+        """Sets the session that this subsession belongs to. Useful for e.g. deserialization.
+        
+        Keyword arguments:
+        session -- The session that this subsession belongs to
+        """
         self.__session = session
 
     def get_session(self) -> Session:
         return self.__session
 
     def set_stream(self, stream_id: int, stream: Stream) -> None:
+        """Sets a complete stream. Useful for e.g. deserialization.
+        
+        Keyword arguments:
+        stream_id -- The id of the stream
+        stream -- The stream that we want to set
+        """
         try:
             self.__streams[stream_id] = stream
         except:
             return
 
     def get_stream(self, stream_id: int) -> Stream:
+        """Returns a full stream.
+        
+        Keyword arguments:
+        stream_id -- The id of the stream that we want
+        """
         try:
             return self.__streams[stream_id]
         except:
@@ -116,33 +196,52 @@ class Subsession:
     def get_streams(self) -> Stream:
         return self.__streams
 
-    def set_model(self, stream_id: int, model) -> None:
+    def set_model(self, stream_id: int, model: Pipeline) -> None:
+        """Sets the model used to predict the images a stream.
+        If not found, None is returned.
+        
+        Keyword arguments:
+        stream_id -- The stream that we'll predict in
+        model -- A Creme pipeline
+        """
         try:
             self.__streams[stream_id].set_model(model)
         except:
             return None
 
-    def get_model(self, stream_id: int):
+    def get_model(self, stream_id: int) -> Pipeline:
+        """Returns the model used to predict in a stream.
+        If not found, None is returned.
+        
+        Keyword arguments:
+        stream_id -- The stream that we're interested in
+        """
         try:
             return self.__streams[stream_id].get_model()
         except:
             return None
 
     def set_parameters(self, parameters: list) -> None:
+        """Sets the parameters used when predicting according to the AL+MT model.
+        
+        Keyword arguments:
+        parameters -- A list of an integer and a float value, e.g., [1, 1.07]
+        """
         self.__parameters = parameters
 
     def get_parameters(self) -> list:
         return self.__parameters
 
     def nbr_of_images(self) -> int:
+        """Returns the number of images in this subsession's streams."""
         return self.__streams[0].size()
 
     def nbr_of_streams(self) -> int:
+        """Returns the number of streams in this subsession."""
         return len(self.__streams)
 
     def serialize(self) -> dict:
-        """
-        """
+        """Converts this subsession object to a dictionary. Returns None if unsuccessful."""
         subsession_data: dict = dict()
         try:
             for stream_id in range(len(self.__streams)):
@@ -165,7 +264,11 @@ class Subsession:
 
     @classmethod
     def deserialize(cls, data: dict) -> Subsession:
-        """
+        """Creates a Subsession object from a serialization dictionary.
+        Returns None if unsuccessful.
+        
+        Keyword arguments:
+        data -- A dictionary generated by serialize()
         """
         try:
             subsession: Subsession = Subsession(
@@ -185,13 +288,18 @@ class Subsession:
             return None
 
 class Session:
-    """
+    """Represents a session, consising of a number of steps. Each step consists
+    of a number of subsessions, each containing a number of image streams.
     """
     
     def __init__(self,
             session_id: uuid,
             steps: int) -> None:
-        """
+        """Initializes a session object.
+        
+        Keyword arguments:
+        session_id -- A universally unique id identifying this session
+        steps -- The number of steps used in this session.
         """
         self.__id: uuid = session_id
         self.__steps: list = [None] * steps
@@ -204,11 +312,20 @@ class Session:
     def add_subsession(self,
             step_id: int,
             subsession: Subsession) -> None:
-        """
+        """Adds a subsession to a step.
+        
+        Keyword arguments:
+        step_id -- The step where we want to put the subsession
+        subsession -- The subsession we want to add
         """
         self.__steps[step_id].insert(subsession.get_session_step(), subsession)
 
     def get_step(self, step_id: int) -> list:
+        """Returns a list of subsession objects. If not found, None is returned.
+        
+        Keyword arguments:
+        step_id -- The step that we're interested in
+        """
         try:
             return self.__steps[step_id]
         except:
@@ -221,20 +338,31 @@ class Session:
         return len(self.__steps)
 
     def nbr_of_subsessions_in_step(self, step_id: int) -> int:
+        """Returns the number of subsessions in a specified step.
+        If not found, 0 is returned.
+        
+        Keyword arguments:
+        step_id -- The step that we're interested in
+        """
         try:
             return len(self.__steps[step_id])
         except:
             return 0
 
     def get_subsession(self, step_id: int, subsession_id: int) -> Subsession:
+        """Returns a specified subsession. If not found, None is returned.
+        
+        Keyword arguments:
+        step_id -- The step that our subsession is located in
+        subsession_id -- The id of the subsession that we're interested in
+        """
         try:
             return self.__steps[step_id][subsession_id]
         except:
             return None
     
     def serialize(self) -> dict:
-        """
-        """
+        """Converts this session object to a dictionary. Returns None if unsuccessful."""
         session_data: dict = dict()
         try:
             session_data['session_id'] = str(self.__id)
@@ -249,7 +377,11 @@ class Session:
     
     @classmethod
     def deserialize(cls, data: dict) -> Session:
-        """
+        """Creates a Session object from a serialization dictionary.
+        Returns None if unsuccessful.
+        
+        Keyword arguments:
+        data -- A dictionary generated by serialize()
         """
         try:
             session: Session = Session(uuid.UUID(int=data['session_id']), len(data['steps']))

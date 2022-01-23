@@ -16,11 +16,13 @@ import uuid
 
 storage: Storage = Storage()
 
-def create_session() -> Session:
+def create_session(nbr_of_steps: int = 4, nbr_of_images: int = 30) -> Session:
+    """Creates and populates a Session object.
+    
+    Keyword arguments:
+    nbr_of_steps -- The number of steps used in this session
+    nbr_of_images -- The number of images used in each subsession stream
     """
-    """
-    nbr_of_steps: int = 4
-    nbr_of_images: int = 30
 
     # Setting up the data structure
     session: Session = Session(create_session_id(), nbr_of_steps)
@@ -44,23 +46,28 @@ def create_session() -> Session:
     return session
 
 def create_session_id() -> uuid:
-    """
-    Generate unique session ID
-    """
+    """Generates a unique session ID"""
     return uuid.uuid4()
 
 def create_subsession(
         session: Session,
         session_step: int,
         strategy: Strategy,
-        number_of_streams: int,
+        nbr_of_streams: int,
         nbr_of_images: int) -> Subsession:
-    """
-    """
-    subsession: Subsession = Subsession(session_step, session, strategy, number_of_streams, nbr_of_images)
+    """Creates and populates a Subsession object.
     
-    #generate and save number_of_streams classifiers, image orders and result lists
-    for stream_id in range(number_of_streams):
+    Keyword arguments:
+    session -- The session that this subsession belongs to
+    session_step -- The step session step that this subsession belongs to
+    strategy -- The strategy used to predict the image contents in this subsession
+    nbr_of_streams -- The number of streams used in this subsession
+    nbr_of_images -- The number of images in each subsession stream
+    """
+    subsession: Subsession = Subsession(session_step, session, strategy, nbr_of_streams, nbr_of_images)
+    
+    #generate and save nbr_of_streams classifiers, image orders and result lists
+    for stream_id in range(nbr_of_streams):
         model = Pipeline(
             StandardScaler(),
             OneVsRestClassifier(classifier=LogisticRegression()))
@@ -79,7 +86,12 @@ def classify(
         subsession: Subsession,
         stream_id: int,
         subsession_step: int) -> tuple:
-    """
+    """Classifies the contents of an image.
+    
+    Keyword arguments:
+    subsession -- The subsession in which the image is located
+    stream_id -- The stream in which the image is located
+    subsession_step -- The position within the stream where we'll find our image
     """
     #load correct model
     model = subsession.get_stream(stream_id).get_model()
@@ -108,14 +120,23 @@ def classify(
 
 def update(
         subsession: Subsession,
-        #session_step: int,
         stream_id: int,
         image_id: str,
         y_true: int,
         prediction: int,
         user_input: int,
         query: bool) -> Subsession:
-    """
+    """Updates the model used to predict a stream's images.
+    
+    Keyword arguments:
+    subsession -- The subsession wherein we'll find our model and images
+    stream_id -- The stream that we're interested in
+    image_id -- The image used for this training sample
+    y_true -- The classification of this image
+    prediction -- The prediction of this image based on the model
+    user_input -- The user's classification of this image
+    query -- Tells whether the model should be updated or not. If false, the
+    result will just be recorded.
     """
     if query:
         # load correct model
@@ -133,5 +154,10 @@ def update(
     return subsession
 
 def save(self, subsession: Subsession) -> None:
+    """Dumps the contents of a subsession to a file.
+    
+    Keyword arguments:
+    subsession -- The subsession to be dumped
+    """
     filename = utils.create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'result')
     pickle.dump(subsession.serialize(), open(filename, 'wb'))

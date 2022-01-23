@@ -18,6 +18,7 @@ results_path = 'results/'
 data_features: list = None
 
 def init() -> None:
+    """Initializes the backend by loading the data featues file."""
     global data_features
     filename = data_path + data_features_name #update to load file
     data_features = pickle.load(open(filename, 'rb')) #UPDATE!!!!!!!!!!
@@ -26,16 +27,26 @@ def create_filename(
         session_id: uuid,
         session_step: int,
         strategy: Strategy,
-        object_type: str
-    ) -> str:
-
+        object_type: str) -> str:
+    """Creates a filename based on a subsession.
+    
+    Keyword arguments:
+    session_id -- The UUID of a session
+    session_step -- The step wherein we'll find the subsession
+    strategy -- The strategy used to predict in this subsession
+    object_type -- A suffix used to tell what the dump actually contains
+    """
     path = results_path if object_type == 'results' else session_path
-    filename = '{0}{1}_{2}_{3}_{4}.pickle'.format(path, session_id, session_step, str(strategy), object_type)
+    filename = '{0}{1}_{2}_{3}_{4}.pickle'.format(path, str(session_id), session_step, str(strategy), object_type)
 
     return filename
 
-def shuffle_im_order(max_images: int):
-
+def shuffle_im_order(max_images: int) -> list:
+    """Generates a randomized list of images of a specified size.
+    
+    Keyword arguments:
+    max_images -- The size of the image list
+    """
     filename = data_path + im_indices_name #update to load file
     image_list = pickle.load(open(filename, 'rb'))
 
@@ -43,6 +54,7 @@ def shuffle_im_order(max_images: int):
 
     return image_list[0:(max_images)]
 
+# FOR AGNES: This is superseded due to the in-memory storage.
 #def next_im_id(
 #        session_id: uuid,
 #        session_step: int,
@@ -59,6 +71,11 @@ def shuffle_im_order(max_images: int):
 #    return im_id
 
 def load_data_sample(image_id: str) -> tuple:
+    """Loads a data sample for the data set.
+    
+    Keyword arguments:
+    image_id -- The name of an image
+    """
     data_sample = data_features[image_id]['features']
     y_true = data_features[image_id]['class']
 
@@ -69,6 +86,14 @@ def AL_uncertainty(
         AL_param,
         data_sample: list,
         prediction: int) -> tuple:
+    """Calculates the uncertainity level of a prediction.
+    
+    Keyword arguments:
+    model -- The model used for a prediction
+    AL_param -- The parameters used for an active learning session
+    data_sample -- The sample on which the prediction is performed
+    prediction -- The prediction made for a sample
+    """
     probs = model.predict_proba_one(data_sample)
     if len(probs.keys()) < 2:
         query = True

@@ -251,10 +251,10 @@ class Subsession:
                 subsession_data[stream_id]['im_index'] = len(self.__streams)
                 subsession_data[stream_id]['results'] = list(self.__streams[stream_id].get_results().values())
                 subsession_data[stream_id]['session_id'] = str(self.__session.get_id())
-                subsession_data[stream_id]['session_step'] = self.__step
+                subsession_data[stream_id]['session_step'] = self.__session_step
                 subsession_data[stream_id]['maxImages'] = self.__streams[stream_id].size()
                 subsession_data[stream_id]['strategy'] = str(self.__strategy)
-                if self.__steams[stream_id].get_strategy() == Strategy.ALMT:
+                if self.__strategy == Strategy.ALMT:
                     subsession_data[stream_id]['param'] = self.__parameters
                 else:
                     subsession_data[stream_id]['param'] = list()
@@ -386,7 +386,7 @@ class Session:
         try:
             session: Session = Session(uuid.UUID(int=data['session_id']), len(data['steps']))
             for step in range(session.nbr_of_steps()):
-                for subsession_idex in range(len(data['steps'])):
+                for subsession_index in range(len(data['steps'])):
                     subsession: Subsession = Subsession.deserialize(data['steps']['subsession_index'])
                     subsession.set_session(session)
                     session.add_subsession(step, subsession)

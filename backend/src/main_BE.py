@@ -159,5 +159,5 @@ def save(subsession: Subsession) -> None:
     Keyword arguments:
     subsession -- The subsession to be dumped
     """
-    filename = utils.create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'result')
+    filename = utils.create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'results')
     pickle.dump(subsession.serialize(), open(filename, 'wb'))

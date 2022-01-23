@@ -210,6 +210,11 @@ def list_subsession_steps(session_id: uuid, step: int, subsession_id: int):
             'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
             'method': 'GET'
         }
+    elif step < session.nbr_of_steps():
+        data['links']['next_step'] = {
+            'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step + 1),
+            'method': 'GET'
+        }
     
     for index in range(subsession.nbr_of_images()):
         element = {
@@ -282,6 +287,11 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
         }
     else:
         data['timeout'] = 30
+        if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
+            data['links']['next_subsession'] = {
+                'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
+                'method': 'GET'
+            }
         
     return jsonify(data)
 
@@ -340,10 +350,10 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         item = {
             'stream': index + 1,
             'image': image,
-            'classification': classification[1],
+            'classification': images[image]['classification'],
             'labels': ['katt', 'hund'], # TODO: Change to real values!
             'image_url': image_base + image,
-            'query': classification[3]
+            'query': bool(images[image]['query'])
         }
         data['images'].append(item)
         item = None
@@ -357,6 +367,11 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     else:
         backend.save(subsession)
         data['timeout'] = 30
+        if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
+            data['links']['next_subsession'] = {
+                'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
+                'method': 'GET'
+            }
         
         
     return jsonify(data)

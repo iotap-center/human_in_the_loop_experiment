@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request, send_from_directory, abort
+from session import Strategy
 from mock_storage import Storage
-import uuid
 import utils
+import uuid
 import main_BE
 import mock_backend
 
@@ -154,7 +155,7 @@ def get_step(session_id: uuid, step: int):
     
     if (step < session.nbr_of_steps()):
         data['links']['next'] = {
-            'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step),
+            'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step + 1),
             'method': 'GET'
         }
     
@@ -271,7 +272,7 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
         item = {
             'stream': index + 1,
             'image': image,
-            'classification': classification[1],
+            'classification': classification[1] if subsession.get_strategy() == Strategy.MT else -1,
             'labels': ['katt', 'hund'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': classification[3]
@@ -287,9 +288,14 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
         }
     else:
         data['timeout'] = 30
-        if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
+        if subsession_id < session.nbr_of_subsessions_in_step(be_step):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
+                'method': 'GET'
+            }
+        elif step < session.nbr_of_steps():
+            data['links']['next_subsession'] = {
+                'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step + 1) + '/subsessions/' + str(1),
                 'method': 'GET'
             }
         
@@ -341,7 +347,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         image = subsession.get_stream(index).get_image(be_sub_step)
         sample = utils.load_data_sample(image)
         subsession = backend.update(subsession,
-            be_sub_step,
+            index,
             image,
             sample[1],
             subsession.get_stream(index).get_prediction(image),
@@ -350,7 +356,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         item = {
             'stream': index + 1,
             'image': image,
-            'classification': images[image]['classification'],
+            'classification': images[image]['classification'] if subsession.get_strategy() == Strategy.MT else -1,
             'labels': ['katt', 'hund'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': bool(images[image]['query'])
@@ -370,6 +376,11 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
+                'method': 'GET'
+            }
+        elif step < session.nbr_of_steps():
+            data['links']['next_subsession'] = {
+                'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step + 1) + '/subsessions/' + str(1),
                 'method': 'GET'
             }
         

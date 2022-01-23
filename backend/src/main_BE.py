@@ -153,7 +153,7 @@ def update(
 
     return subsession
 
-def save(self, subsession: Subsession) -> None:
+def save(subsession: Subsession) -> None:
     """Dumps the contents of a subsession to a file.
     
     Keyword arguments:

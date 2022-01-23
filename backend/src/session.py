@@ -97,7 +97,7 @@ class Stream:
                  user_input: int,
                  query: bool]
         """
-        self.__results[list[0]] = result
+        self.__results[result[0]] = result
 
     def set_results(self, results: dict) -> None:
         """Sets a complete list of results. Useful for e.g. deserialization.

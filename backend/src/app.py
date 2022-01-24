@@ -356,8 +356,8 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         item = {
             'stream': index + 1,
             'image': image,
-            'classification': images[image]['classification'] if subsession.get_strategy() == Strategy.MT else -1,
-            'labels': ['katt', 'hund'], # TODO: Change to real values!
+            'classification': images[image]['classification'],
+            'labels': ['cat', 'dog'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': bool(images[image]['query'])
         }

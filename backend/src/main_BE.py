@@ -5,7 +5,7 @@ from creme.preprocessing import StandardScaler
 from creme.compose import Pipeline
 from creme.metrics import Accuracy
 from creme import stream
-from mock_storage import Storage
+from memory_storage import Storage
 from session import Session, Subsession, Strategy, Stream
 import numpy as np
 import glob

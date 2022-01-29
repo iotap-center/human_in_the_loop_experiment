@@ -1,7 +1,7 @@
 from timeit import default_timer
 from flask import Flask, jsonify, request, send_from_directory, abort
 from session import Session, Strategy, Subsession
-from mock_storage import Storage
+from memory_storage import Storage
 import utils
 import uuid
 import main_BE

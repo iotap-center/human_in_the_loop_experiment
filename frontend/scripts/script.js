@@ -73,18 +73,7 @@ const fetchSubsession = function (link) {
 };
 
 const fetchSubsessionStep = function (link) {
-  return new Promise( (resolve, reject) => {
-    $.ajax({
-      url: link.href,
-      method: link.method,
-      success: function (data) {
-        resolve(data);
-      },
-      error: function (error) {
-        reject(error);
-      }
-    });
-  });
+  return justFetch(link);
 };
 
 const justFetch = function (link) {
@@ -115,7 +104,6 @@ const prepareNextStep = async function (data) {
       .then(fetchSubsessionStep)
       .then(presentSubsessionStep)
       .then(prepareNextStep);
-  } else {
   }
 };
 
@@ -149,7 +137,6 @@ const presentSubsessionStep = function (data) {
 
 const compileResponses = function () {
   const fieldsets = document.getElementsByTagName("fieldset");
-  const form = document.getElementById('step_data');
   const compilation = {};
   const items = [];
   
@@ -240,41 +227,45 @@ const addImage = function (imageURL, image, stream, prediction, classes, query) 
   rootDiv.classList.add("grid-item");
   wrapper.appendChild(rootDiv);
   
-  const imageDiv = document.createElement("div");
-  imageDiv.classList.add("image-container");
-  rootDiv.appendChild(imageDiv);
-  
-  const imageElement = document.createElement("img");
-  imageElement.src = imageURL;
-  imageDiv.appendChild(imageElement);
-  
-  const fieldset = document.createElement("fieldset");
-  fieldset.classList.add("grid-container");
-  rootDiv.appendChild(fieldset);
-  
-  fieldset.appendChild(createHiddenInput("image", image));
-  fieldset.appendChild(createHiddenInput("stream", stream));
-  fieldset.appendChild(createHiddenInput("query", query));
-  
-  for (let i = 0; i < classes.length; i++) {
-    let label = document.createElement("label");
-    let input = document.createElement("input");
-    let labelText = document.createTextNode(classes[i]);
-    let id = name + '-' + i;
+  if (query) {
+    const imageDiv = document.createElement("div");
+    imageDiv.classList.add("image-container");
+    rootDiv.appendChild(imageDiv);
     
-    label.setAttribute("for", id);
-    label.classList.add("grid-item");
+    const imageElement = document.createElement("img");
+    imageElement.src = imageURL;
+    imageDiv.appendChild(imageElement);
     
-    input.id = id;
-    input.setAttribute("type", "radio");
-    input.setAttribute("name", name);
-    input.setAttribute("value", i);
-    if (prediction == i) {
-      input.checked = true;
+    const fieldset = document.createElement("fieldset");
+    fieldset.classList.add("grid-container");
+    rootDiv.appendChild(fieldset);
+    
+    fieldset.appendChild(createHiddenInput("image", image));
+    fieldset.appendChild(createHiddenInput("stream", stream));
+    fieldset.appendChild(createHiddenInput("query", query));
+    
+    for (let i = 0; i < classes.length; i++) {
+      let label = document.createElement("label");
+      let input = document.createElement("input");
+      let labelText = document.createTextNode(classes[i]);
+      let id = name + '-' + i;
+      
+      label.setAttribute("for", id);
+      label.classList.add("grid-item");
+      
+      input.id = id;
+      input.setAttribute("type", "radio");
+      input.setAttribute("name", name);
+      input.setAttribute("value", i);
+      if (prediction == i) {
+        input.checked = true;
+      }
+      
+      label.appendChild(labelText);
+      fieldset.appendChild(label);
+      fieldset.appendChild(input);
     }
-    
-    label.appendChild(labelText);
-    fieldset.appendChild(label);
-    fieldset.appendChild(input);
+  } else {
+    rootDiv.innerHTML = "[No image in this step]";
   }
 };

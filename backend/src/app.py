@@ -268,12 +268,12 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
     
     for index in range(subsession.nbr_of_streams()):
         image = subsession.get_stream(index).get_image(be_sub_step)
-        classification: list = backend.classify(subsession, index, be_sub_step)
+        classification: tuple = backend.classify(subsession, index, be_sub_step)
         item = {
             'stream': index + 1,
             'image': image,
-            'classification': classification[1] if subsession.get_strategy() == Strategy.MT else -1,
-            'labels': ['katt', 'hund'], # TODO: Change to real values!
+            'classification': classification[2],
+            'labels': ['cat', 'dog'], # TODO: Change to real values!
             'image_url': image_base + image,
             'query': classification[3]
         }

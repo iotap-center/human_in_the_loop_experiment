@@ -1,3 +1,4 @@
+from timeit import default_timer
 from flask import Flask, jsonify, request, send_from_directory, abort
 from session import Session, Strategy, Subsession
 from mock_storage import Storage
@@ -12,6 +13,9 @@ image_base: str = '/images/'
 frontend_dir: str = '../../frontend'
 storage: Storage = Storage()
 backend = main_BE
+
+step_duration = 5
+subsession_pause_duration = 0
 
 @app.route('/', methods=['GET'])
 def serve_frontend():
@@ -281,13 +285,13 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
         item = None
     
     if sub_step < subsession.get_stream(0).size():
-        data['timeout'] = 5
+        data['timeout'] = step_duration
         data['links']['next'] = {
             'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id) + '/steps/' + str(sub_step + 1),
             'method': 'GET'
         }
     else:
-        data['timeout'] = 30
+        data['timeout'] = subsession_pause_duration
         if subsession_id < session.nbr_of_subsessions_in_step(be_step):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
@@ -366,14 +370,14 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
             item = None
     
     if sub_step < subsession.get_stream(0).size():
-        data['timeout'] = 5
+        data['timeout'] = step_duration
         data['links']['next'] = {
             'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id) + '/steps/' + str(sub_step + 1),
             'method': 'GET'
         }
     else:
         backend.save(subsession)
-        data['timeout'] = 0
+        data['timeout'] = subsession_pause_duration
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),

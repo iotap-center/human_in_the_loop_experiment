@@ -99,7 +99,8 @@ const prepareNextStep = async function (data) {
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
-    await sleep(step_duration);
+    clearImages();
+    await showMessageAndAwaitGo();
     putSubsessionStep(compileResponses(), data.links.update)
       .then(result => fetchSubsession(data.links.next_subsession))
       .then(fetchSubsessionStep)
@@ -185,10 +186,31 @@ const sleep = function (duration) {
   return new Promise(resolve => setTimeout(resolve, duration));
 };
 
-const tick = function (update) {
-  return function() {
-    clearTimeout(timer);
-  };
+const showMessageAndAwaitGo = async function() {
+  return new Promise((resolve, reject) => {
+    const wrapper = document.getElementById("wrapper");
+  
+    // Yes, this is an ugly hack. We do this to avoid
+    // doing stuff to the css, because we're lazy
+    wrapper.appendChild(document.createElement("div"));
+    wrapper.appendChild(document.createElement("div"));
+    wrapper.appendChild(document.createElement("div"));
+    wrapper.appendChild(document.createElement("div"));
+  
+    const infoContainer = document.createElement("div");
+    infoContainer.classList.add("info-container")
+    wrapper.appendChild(infoContainer);
+  
+    const infoText = document.createElement("p");
+    infoText.innerHTML = "Time for a pause! Let us know when you're ready for the next step.";
+    infoContainer.appendChild(infoText);
+  
+    const nextButton = document.createElement("button");
+    nextButton.setAttribute("type", "button");
+    nextButton.innerHTML = "I'm ready, let's start!";
+    nextButton.onclick = resolve;
+    infoContainer.appendChild(nextButton);
+  });
 };
 
 const themeRadioButtons = function () {

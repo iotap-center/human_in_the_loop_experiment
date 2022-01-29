@@ -373,7 +373,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         }
     else:
         backend.save(subsession)
-        data['timeout'] = 30
+        data['timeout'] = 0
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),

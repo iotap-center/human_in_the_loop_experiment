@@ -26,6 +26,10 @@ fieldset {
   /* border: 1px solid black; */
 }
 
+.info-container {
+  text-align: center;
+}
+
 .image-container {
   height: 200px;
 }

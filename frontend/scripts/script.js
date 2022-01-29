@@ -160,7 +160,7 @@ const buildResponseItem = function (fieldset) {
   for (const element of fieldset.elements) {
     if (element.type == 'radio') {
       if (element.checked) {
-        item.classification = i - 2;
+        item.classification = i;
         break;
       }
       i++;

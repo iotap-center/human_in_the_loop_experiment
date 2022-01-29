@@ -346,7 +346,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     for index in range(subsession.nbr_of_streams()):
         image = subsession.get_stream(index).get_image(be_sub_step)
         sample = utils.load_data_sample(image)
-        if images[image]['classification']:
+        if image in images and images[image]['classification'] >= 0:
             subsession = backend.update(subsession,
                 index,
                 image,
@@ -354,16 +354,16 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
                 subsession.get_stream(index).get_prediction(image),
                 images[image]['classification'],
                 bool(images[image]['query']))
-        item = {
-            'stream': index + 1,
-            'image': image,
-            'classification': images[image]['classification'],
-            'labels': ['cat', 'dog'], # TODO: Change to real values!
-            'image_url': image_base + image,
-            'query': bool(images[image]['query'])
-        }
-        data['images'].append(item)
-        item = None
+            item = {
+                'stream': index + 1,
+                'image': image,
+                'classification': images[image]['classification'],
+                'labels': ['cat', 'dog'], # TODO: Change to real values!
+                'image_url': image_base + image,
+                'query': bool(images[image]['query'])
+            }
+            data['images'].append(item)
+            item = None
     
     if sub_step < subsession.get_stream(0).size():
         data['timeout'] = 5

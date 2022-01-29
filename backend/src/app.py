@@ -346,13 +346,14 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     for index in range(subsession.nbr_of_streams()):
         image = subsession.get_stream(index).get_image(be_sub_step)
         sample = utils.load_data_sample(image)
-        subsession = backend.update(subsession,
-            index,
-            image,
-            sample[1],
-            subsession.get_stream(index).get_prediction(image),
-            images[image]['classification'],
-            bool(images[image]['query']))
+        if images[image]['classification']:
+            subsession = backend.update(subsession,
+                index,
+                image,
+                sample[1],
+                subsession.get_stream(index).get_prediction(image),
+                images[image]['classification'],
+                bool(images[image]['query']))
         item = {
             'stream': index + 1,
             'image': image,

@@ -1,4 +1,4 @@
-let duration = 5000;
+let step_duration = 5000;
 let timer = null;
 
 // Setup
@@ -92,15 +92,16 @@ const justFetch = function (link) {
 };
 
 const prepareNextStep = async function (data) {
-  //startTimer(data.timeout * 1000);
   if (data.links.next) {
-      putSubsessionStep(compileResponses(), data.links.update)
-        .then(data => fetchSubsessionStep(data.links.next))
+    await sleep(step_duration);
+    putSubsessionStep(compileResponses(), data.links.update)
+        .then(result => fetchSubsessionStep(data.links.next))
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
+    await sleep(step_duration);
     putSubsessionStep(compileResponses(), data.links.update)
-      .then(data => fetchSubsession(data.links.next_subsession))
+      .then(result => fetchSubsession(data.links.next_subsession))
       .then(fetchSubsessionStep)
       .then(presentSubsessionStep)
       .then(prepareNextStep);
@@ -127,6 +128,7 @@ const putSubsessionStep = function (compilation, link) {
 
 const presentSubsessionStep = function (data) {
   return new Promise( (resolve, reject) => {
+    step_duration = data.timeout * 1000;
     setupForm(data);
     clearImages();
     addImages(data.images);
@@ -140,8 +142,8 @@ const compileResponses = function () {
   const compilation = {};
   const items = [];
   
-  for (let i = 0; i < fieldsets.length; i++) {
-    items.push(buildResponseItem(fieldsets[i]));
+  for (const fieldset of fieldsets) {
+    items.push(buildResponseItem(fieldset));
   }
   compilation.images = items;
   return compilation;
@@ -154,11 +156,16 @@ const buildResponseItem = function (fieldset) {
   item.query = fieldset.elements[2].value == "true" ? true : false;
   item.classification = -1;
   
-  for (let i = 2; i < fieldset.elements.length; i++) {
-    if (fieldset.elements[i].checked) {
-      item.classification = i - 2;
-      break;
+  let i = 0;
+  for (const element of fieldset.elements) {
+    if (element.type == 'radio') {
+      if (element.checked) {
+        item.classification = i - 2;
+        break;
+      }
+      i++;
     }
+
   }
   
   return item;
@@ -174,8 +181,8 @@ const justLog = function (data, message = false) {
   });
 };
 
-const startTimer = function (update) {
-  timer = setTimeout(tick(update), duration);
+const sleep = function (duration) {
+  return new Promise(resolve => setTimeout(resolve, duration));
 };
 
 const tick = function (update) {
@@ -213,8 +220,7 @@ const clearImages = function () {
 };
 
 const addImages = function (images) {
-  for (let i = 0; i < images.length; i++) {
-    let image = images[i];
+  for (const image of images) {
     addImage(image.image_url, image.image, image.stream, image.classification, image.labels, image.query);
   }
 };
@@ -225,6 +231,7 @@ const addImage = function (imageURL, image, stream, prediction, classes, query) 
   
   const rootDiv = document.createElement("div");
   rootDiv.classList.add("grid-item");
+  rootDiv.classList.add("item-container");
   wrapper.appendChild(rootDiv);
   
   if (query) {

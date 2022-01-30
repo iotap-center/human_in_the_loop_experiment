@@ -17,14 +17,14 @@ class Storage:
     def get_sessions(self) -> dict:
         return self.__backend.get_sessions()
 
-    def get_session(self, session: uuid) -> Session:
-        return self.__backend.get_session(session)
+    def get_session(self, session_id: uuid) -> Session:
+        return self.__backend.get_session(session_id)
 
-    def get_nbr_of_steps(self, session: uuid) -> int:
-        return self.__backend.get_nbr_of_steps(session)
+    def get_nbr_of_steps(self, session_id: uuid) -> int:
+        return self.__backend.get_nbr_of_steps(session_id)
 
-    def get_steps(self, session: uuid) -> list:
-        return self.__backend.get_steps(session)
+    def get_steps(self, session_id: uuid) -> list:
+        return self.__backend.get_steps(session_id)
 
-    def get_step(self, session: uuid, step_id: int) -> dict:
-        return self.__backend.get_step(session, step_id)
+    def get_step(self, session_id: uuid, step_id: int) -> dict:
+        return self.__backend.get_step(session_id, step_id)

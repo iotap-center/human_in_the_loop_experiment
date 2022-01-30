@@ -20,32 +20,32 @@ class MemoryStorage:
     def get_sessions(self) -> dict:
         return self.__store.copy()
 
-    def get_session(self, session: uuid) -> Session:
-        if session.int in self.__store:
-            return self.__store[session.int]
+    def get_session(self, session_id: uuid) -> Session:
+        if session_id.int in self.__store:
+            return self.__store[session_id.int]
         else:
             return None
 
-    def get_nbr_of_steps(self, session: uuid) -> int:
+    def get_nbr_of_steps(self, session_id: uuid) -> int:
         steps: int = -1
         
-        if session.int in self.__store:
-            steps = self.__store[session.int].nbr_of_steps()
+        if session_id.int in self.__store:
+            steps = self.__store[session_id.int].nbr_of_steps()
 
         return steps
 
-    def get_steps(self, session: uuid) -> list:
+    def get_steps(self, session_id: uuid) -> list:
         steps: list = None
         
-        if session.int in self.__store:
-            steps = self.__store[session.int].get_steps()
+        if session_id.int in self.__store:
+            steps = self.__store[session_id.int].get_steps()
 
         return steps
 
-    def get_step(self, session: uuid, step_id: int) -> dict:
+    def get_step(self, session_id: uuid, step_id: int) -> dict:
         step: dict = None
         
-        if session.int in self.__store:
-            step = self.__store[session.int]['steps'][step_id]
+        if session_id.int in self.__store:
+            step = self.__store[session_id.int]['steps'][step_id]
 
         return step

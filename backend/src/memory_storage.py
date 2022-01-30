@@ -1,7 +1,7 @@
 from session import Session
 import uuid
 
-class Storage:
+class MemoryStorage:
 
     def __init__(self) -> None:
         self.__store: dict = dict()

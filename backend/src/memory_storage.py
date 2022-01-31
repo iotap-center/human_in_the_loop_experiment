@@ -9,6 +9,9 @@ class MemoryStorage:
     def add_session(self, session: Session) -> None:
         self.__store[session.get_id().int] = session
 
+    def remove_session(self, session_id) -> None:
+        self.__store.pop(session_id.int)
+
     def list_sessions(self) -> list:
         sessions = list()
         

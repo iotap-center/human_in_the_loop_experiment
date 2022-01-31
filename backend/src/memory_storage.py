@@ -17,9 +17,6 @@ class MemoryStorage:
 
         return sessions
 
-    def get_sessions(self) -> dict:
-        return self.__store.copy()
-
     def get_session(self, session_id: uuid) -> Session:
         if session_id.int in self.__store:
             return self.__store[session_id.int]

@@ -14,12 +14,6 @@ class Storage:
     def list_sessions(self) -> list:
         return self.__backend.list_sessions()
 
-    def get_sessions(self) -> dict:
-        return self.__backend.get_sessions()
-
-    def get_session(self, session_id: uuid) -> Session:
-        return self.__backend.get_session(session_id)
-
     def get_nbr_of_steps(self, session_id: uuid) -> int:
         return self.__backend.get_nbr_of_steps(session_id)
 

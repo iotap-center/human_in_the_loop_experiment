@@ -1,18 +1,22 @@
 from session import Strategy
+import configparser
 import pickle
 import random
 import uuid
 
+config = configparser.ConfigParser()
+config.read('config/app.ini')
+
 # Path to folder were the static data is stored, file with feature data, etc.
-data_path = 'data/'
-data_features_name = 'features.pickle'
-im_indices_name = 'im_indices.pickle'
+data_path = config['backend']['data_path']
+data_features_name = config['backend']['data_features_name']
+im_indices_name = config['backend']['im_indices_name']
 
 # Path to folder were all data used during the session is used, ML models, etc.
-session_path = 'session_data/'
+session_path = config['backend']['session_path']
 
 # Path to folder were all results are stored
-results_path = 'results/'
+results_path = config['backend']['results_path']
 
 # Features file
 data_features: list = None

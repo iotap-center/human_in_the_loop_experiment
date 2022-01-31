@@ -2,15 +2,20 @@ from timeit import default_timer
 from flask import Flask, jsonify, request, send_from_directory, abort
 from session import Session, Strategy, Subsession
 from storage import Storage
+import configparser
 import utils
 import uuid
 import main_BE
 import mock_backend
 
 app = Flask(__name__)
-base_url: str = '/api/v1'
-image_base: str = '/images/'
-frontend_dir: str = '../../frontend'
+config = configparser.ConfigParser()
+config.read('config/app.ini')
+
+base_url: str = config['api']['base_url']
+frontend_base: str = config['frontend']['frontend_base']
+image_base: str = config['frontend']['image_base']
+image_directory: str = config['frontend']['image_directory']
 storage: Storage = Storage()
 backend = main_BE
 
@@ -19,20 +24,20 @@ subsession_pause_duration = 0
 
 @app.route('/', methods=['GET'])
 def serve_frontend():
-    return send_from_directory(frontend_dir, 'index.html')
+    return send_from_directory(frontend_base, 'index.html')
 
 @app.route('/script/<string:script>', methods=['GET'])
 def serve_scripts(script: str):
-    return send_from_directory(frontend_dir + '/scripts', script)
+    return send_from_directory(frontend_base + '/scripts', script)
 
 @app.route('/style/<string:style>', methods=['GET'])
 def serve_styles(style: str):
-    return send_from_directory(frontend_dir + '/styles', style)
+    return send_from_directory(frontend_base + '/styles', style)
 
 # TODO: Byt ut mot CDN
 @app.route('/images/<string:image>', methods=['GET'])
 def serve_images(image: str):
-    return send_from_directory(frontend_dir + '/images', image)
+    return send_from_directory(image_base, image)
 
 @app.route(base_url + '/sessions', methods=['GET'])
 def list_sessions():

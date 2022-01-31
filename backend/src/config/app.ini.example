@@ -1,0 +1,18 @@
+[backend]
+data_path = data/
+data_features_name = features.pickle
+im_indices_name = im_indicies.pickle
+session_path = session_data/
+results_path = results/
+default_nbr_of_steps = 4
+default_nbr_of_images = 30
+
+[api]
+base_url = /api/v1
+
+[frontend]
+frontend_base = 
+image_base = /
+image_directory = images/
+
+[aws]

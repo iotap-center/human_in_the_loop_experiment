@@ -13,16 +13,26 @@ import time
 import utils as utils
 import pickle
 import uuid
+import configparser
 
 storage: Storage = Storage()
+config = configparser.ConfigParser()
+config.read('config/app.ini')
 
-def create_session(nbr_of_steps: int = 4, nbr_of_images: int = 30) -> Session:
-    """Creates and populates a Session object.
+def create_session(nbr_of_steps: int = 0, nbr_of_images: int = 0) -> Session:
+    """Creates and populates a Session object. If the arguments aren't set,
+    they will be read from the config file
     
     Keyword arguments:
     nbr_of_steps -- The number of steps used in this session
     nbr_of_images -- The number of images used in each subsession stream
     """
+
+    # Checking arguments
+    if nbr_of_steps < 1:
+        nbr_of_steps = int(config['backend']['default_nbr_of_steps'])
+    if nbr_of_images < 1:
+        nbr_of_images = int(config['backend']['default_nbr_of_images'])
 
     # Setting up the data structure
     session: Session = Session(create_session_id(), nbr_of_steps)

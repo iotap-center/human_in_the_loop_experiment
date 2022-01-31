@@ -7,4 +7,5 @@ backend/src/__pychache__/
 backend/src/session_data/
 backend/src/data/
 backend/src/results/
+backend/src/config/*.ini
 *.pyc

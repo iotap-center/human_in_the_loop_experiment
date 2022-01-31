@@ -1,4 +1,4 @@
-from session import Session
+from session import Session, Subsession
 import uuid
 
 class MemoryStorage:
@@ -49,3 +49,7 @@ class MemoryStorage:
             step = self.__store[session_id.int]['steps'][step_id]
 
         return step
+
+    def save_subsession(self, subsession: Subsession, filename: str) -> None:
+        # Memory-based storage is instantly "saved", hence this is empty
+        pass

@@ -1,5 +1,5 @@
 from re import S
-from session import Session
+from session import Session, Subsession
 from storage.memory_storage import MemoryStorage
 import uuid
 
@@ -25,3 +25,6 @@ class Storage:
 
     def get_step(self, session_id: uuid, step_id: int) -> dict:
         return self.__backend.get_step(session_id, step_id)
+
+    def save_subsession(self, subsession: Subsession, filename: str) -> None:
+        self.__backend.save_subsession(subsession, filename)

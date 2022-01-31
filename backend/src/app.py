@@ -1,7 +1,7 @@
 from timeit import default_timer
 from flask import Flask, jsonify, request, send_from_directory, abort
 from session import Session, Strategy, Subsession
-from storage import Storage
+from storage.storage import Storage
 import configparser
 import utils
 import uuid
@@ -37,7 +37,7 @@ def serve_styles(style: str):
 # TODO: Byt ut mot CDN
 @app.route('/images/<string:image>', methods=['GET'])
 def serve_images(image: str):
-    return send_from_directory(image_base, image)
+    return send_from_directory(image_directory, image)
 
 @app.route(base_url + '/sessions', methods=['GET'])
 def list_sessions():

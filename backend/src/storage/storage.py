@@ -1,6 +1,6 @@
 from re import S
 from session import Session
-from memory_storage import MemoryStorage
+from storage.memory_storage import MemoryStorage
 import uuid
 
 class Storage:

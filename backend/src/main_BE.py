@@ -5,7 +5,7 @@ from creme.preprocessing import StandardScaler
 from creme.compose import Pipeline
 from creme.metrics import Accuracy
 from creme import stream
-from storage import Storage
+from storage.storage import Storage
 from session import Session, Subsession, Strategy, Stream
 import numpy as np
 import glob

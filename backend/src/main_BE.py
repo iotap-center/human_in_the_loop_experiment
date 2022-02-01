@@ -5,17 +5,14 @@ from creme.preprocessing import StandardScaler
 from creme.compose import Pipeline
 from creme.metrics import Accuracy
 from creme import stream
-from storage.storage import Storage
 from session import Session, Subsession, Strategy, Stream
 import numpy as np
 import glob
 import time
 import utils as utils
-import pickle
 import uuid
 import configparser
 
-storage: Storage = Storage()
 config = configparser.ConfigParser()
 config.read('config/app.ini')
 
@@ -162,12 +159,3 @@ def update(
     subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input, query])
 
     return subsession
-
-def save(subsession: Subsession) -> None:
-    """Dumps the contents of a subsession to a file.
-    
-    Keyword arguments:
-    subsession -- The subsession to be dumped
-    """
-    filename = utils.create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'results')
-    pickle.dump(subsession.serialize(), open(filename, 'wb'))

@@ -1,12 +1,10 @@
-from timeit import default_timer
 from flask import Flask, jsonify, request, send_from_directory, abort
-from session import Session, Strategy, Subsession
+from session import Session, Subsession
 from storage.storage import Storage
 import configparser
 import utils
 import uuid
 import main_BE
-import mock_backend
 
 app = Flask(__name__)
 config = configparser.ConfigParser()
@@ -16,11 +14,11 @@ base_url: str = config['api']['base_url']
 frontend_base: str = config['frontend']['frontend_base']
 image_base: str = config['frontend']['image_base']
 image_directory: str = config['frontend']['image_directory']
-storage: Storage = Storage()
+storage: Storage = Storage.create_storage("disk")
 backend = main_BE
 
-step_duration = 5
-subsession_pause_duration = 0
+step_duration: int = int(config['frontend']['step_duration'])
+subsession_pause_duration: int = int(config['frontend']['subsession_pause_duration'])
 
 @app.route('/', methods=['GET'])
 def serve_frontend():
@@ -381,7 +379,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
             'method': 'GET'
         }
     else:
-        backend.save(subsession)
+        storage.save_subsession(subsession)
         data['timeout'] = subsession_pause_duration
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
             data['links']['next_subsession'] = {

@@ -2,7 +2,7 @@
 data_path = data/
 data_features_name = features.pickle
 im_indices_name = im_indicies.pickle
-session_path = session_data/
+sessions_path = session_data/
 results_path = results/
 default_nbr_of_steps = 4
 default_nbr_of_images = 30
@@ -14,5 +14,7 @@ base_url = /api/v1
 frontend_base = 
 image_base = /
 image_directory = images/
+step_duration = 5
+subsession_pause_duration = 0
 
 [aws]

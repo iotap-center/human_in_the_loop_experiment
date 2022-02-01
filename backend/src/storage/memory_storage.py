@@ -50,6 +50,6 @@ class MemoryStorage:
 
         return step
 
-    def save_subsession(self, subsession: Subsession, filename: str) -> None:
+    def save_subsession(self, subsession: Subsession) -> None:
         # Memory-based storage is instantly "saved", hence this is empty
         pass

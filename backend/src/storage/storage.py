@@ -1,12 +1,15 @@
-from re import S
 from session import Session, Subsession
+from storage.disk_storage import DiskStorage
 from storage.memory_storage import MemoryStorage
 import uuid
 
+# This is an ugly hack used to  satisfy some internal dependencies
+Storage = type('Storage', (object,), {})
+
 class Storage:
 
-    def __init__(self) -> None:
-        self.__backend: MemoryStorage = MemoryStorage()
+    def __init__(self, backend) -> None:
+        self.__backend = backend
 
     def add_session(self, session: Session) -> None:
         self.__backend.add_session(session)
@@ -26,5 +29,12 @@ class Storage:
     def get_step(self, session_id: uuid, step_id: int) -> dict:
         return self.__backend.get_step(session_id, step_id)
 
-    def save_subsession(self, subsession: Subsession, filename: str) -> None:
-        self.__backend.save_subsession(subsession, filename)
+    def save_subsession(self, subsession: Subsession) -> None:
+        self.__backend.save_subsession(subsession)
+
+    @classmethod
+    def create_storage(cls, backend: str) -> Storage:
+        if backend == 'disk':
+            return Storage(DiskStorage())
+        else:
+            return Storage(MemoryStorage())

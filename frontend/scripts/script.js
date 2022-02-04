@@ -103,20 +103,23 @@ const justFetch = function (link) {
 };
 
 const prepareNextStep = async function (data) {
+  await sleep(step_duration);
   if (data.links.next) {
-    await sleep(step_duration);
     putSubsessionStep(compileResponses(), data.links.update)
         .then(result => fetchSubsessionStep(data.links.next))
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
-    await showMessageAndAwaitGo(data.end_message)
-      .then(hideMessageAndStart);
     putSubsessionStep(compileResponses(), data.links.update)
       .then(result => fetchSubsession(data.links.next_subsession))
       .then(fetchSubsessionStep)
       .then(presentSubsessionStep)
+      .then(result => showMessageAndAwaitGo(data.end_message))
+      .then(hideMessageAndStart)
       .then(prepareNextStep);
+  } else {
+    showMessageAndAwaitGo(data.end_message)
+      .then(justLog(""));
   }
 };
 
@@ -207,6 +210,7 @@ const hideMessageAndStart = async function() {
 
 const showMessageAndAwaitGo = async function(message) {
   return new Promise((resolve, reject) => {
+    clearImages();
     const wrapper = document.getElementById("wrapper");
     wrapper.style.visibility = "hidden";
 

@@ -148,6 +148,7 @@ class Subsession:
         self.__session_step: int = session_step
         self.__session: Session = session
         self.__strategy: Strategy = strategy
+        self.__end_message: str = ""
         self.__parameters: list = list()
         self.__streams: list = list()
         for i in range(nbr_of_streams):
@@ -168,7 +169,20 @@ class Subsession:
         self.__session = session
 
     def get_session(self) -> Session:
+        """ Returns the session that this subsession belongs to."""
         return self.__session
+
+    def set_end_message(self, end_message: str) -> None:
+        """Sets the end message that follows upon the completion of this sub session.
+
+        Keyword arguments:
+        end_message -- The message to display
+        """
+        self.__end_message = end_message
+    
+    def get_end_message(self) -> str:
+        """Returns the end message"""
+        return self.__end_message
 
     def set_stream(self, stream_id: int, stream: Stream) -> None:
         """Sets a complete stream. Useful for e.g. deserialization.
@@ -243,6 +257,7 @@ class Subsession:
     def serialize(self) -> dict:
         """Converts this subsession object to a dictionary. Returns None if unsuccessful."""
         subsession_data: dict = dict()
+        subsession_data['end_message'] = self.__end_message
         try:
             for stream_id in range(len(self.__streams)):
                 subsession_data[stream_id] = dict()
@@ -277,6 +292,7 @@ class Subsession:
                     Strategy[subsession_data[0]['strategy']],
                     len(subsession_data),
                     subsession_data[0]['maxImages'])
+            subsession.set_end_message(subsession_data['end_message'])
             subsession.set_current_index(subsession_data[0]['im_index'])
             subsession.set_parameters(subsession_data[0]['param'])
             for stream_id in range(len(subsession_data)):

@@ -35,20 +35,20 @@ def create_session(nbr_of_steps: int = 0, nbr_of_images: int = 0) -> Session:
     session: Session = Session(create_session_id(), nbr_of_steps)
     
     # Step 1
-    session.add_subsession(0, create_subsession(session, 0, Strategy.MT, 1, nbr_of_images));
-    session.add_subsession(0, create_subsession(session, 0, Strategy.ALMT, 1, nbr_of_images));
+    session.add_subsession(0, create_subsession(session, 0, Strategy.MT, 1, nbr_of_images, "In the next part you will see 1 image at a time again, but this image will not be displayed all the time (when it is not displayed you cannot provide feedback)."));
+    session.add_subsession(0, create_subsession(session, 0, Strategy.ALMT, 1, nbr_of_images, "In the next part you will see 3 images at a time."));
     
     # Step 2
-    session.add_subsession(1, create_subsession(session, 1, Strategy.MT, 3, nbr_of_images));
-    session.add_subsession(1, create_subsession(session, 1, Strategy.ALMT, 3, nbr_of_images));
+    session.add_subsession(1, create_subsession(session, 1, Strategy.MT, 3, nbr_of_images, "In the next part you will see 3 images at a time again, but the images will not be displayed all the time (when it is not displayed you cannot provide feedback)."));
+    session.add_subsession(1, create_subsession(session, 1, Strategy.ALMT, 3, nbr_of_images, "In the next part you will see 6 images at a time."));
     
     # Step 3
-    session.add_subsession(2, create_subsession(session, 2, Strategy.MT, 6, nbr_of_images));
-    session.add_subsession(2, create_subsession(session, 2, Strategy.ALMT, 6, nbr_of_images));
+    session.add_subsession(2, create_subsession(session, 2, Strategy.MT, 6, nbr_of_images, "In the next part you will see 6 images at a time again, but the images will not be displayed all the time (when it is not displayed you cannot provide feedback)."));
+    session.add_subsession(2, create_subsession(session, 2, Strategy.ALMT, 6, nbr_of_images, "In the next part you will see 9 images at a time."));
     
     # Step 4
-    session.add_subsession(3, create_subsession(session, 3, Strategy.MT, 9, nbr_of_images));
-    session.add_subsession(3, create_subsession(session, 3, Strategy.ALMT, 9, nbr_of_images));
+    session.add_subsession(3, create_subsession(session, 3, Strategy.MT, 9, nbr_of_images, "In the next part you will see 9 images at a time again, but the images will not be displayed all the time (when it is not displayed you cannot provide feedback)."));
+    session.add_subsession(3, create_subsession(session, 3, Strategy.ALMT, 9, nbr_of_images, "That was the last part, thank you for your participation in the experiments!"));
     
     return session
 
@@ -61,7 +61,8 @@ def create_subsession(
         session_step: int,
         strategy: Strategy,
         nbr_of_streams: int,
-        nbr_of_images: int) -> Subsession:
+        nbr_of_images: int,
+        end_message: str) -> Subsession:
     """Creates and populates a Subsession object.
     
     Keyword arguments:
@@ -72,6 +73,7 @@ def create_subsession(
     nbr_of_images -- The number of images in each subsession stream
     """
     subsession: Subsession = Subsession(session_step, session, strategy, nbr_of_streams, nbr_of_images)
+    subsession.set_end_message(end_message)
     
     #generate and save nbr_of_streams classifiers, image orders and result lists
     for stream_id in range(nbr_of_streams):

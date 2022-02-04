@@ -295,6 +295,7 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
         }
     else:
         data['timeout'] = subsession_pause_duration
+        data['end_message'] = subsession.get_end_message()
         if subsession_id < session.nbr_of_subsessions_in_step(be_step):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),
@@ -374,6 +375,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     
     if sub_step < subsession.get_stream(0).size():
         data['timeout'] = step_duration
+        data['end_message'] = subsession.get_end_message()
         data['links']['next'] = {
             'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id) + '/steps/' + str(sub_step + 1),
             'method': 'GET'
@@ -381,6 +383,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     else:
         storage.save_subsession(subsession)
         data['timeout'] = subsession_pause_duration
+        data['end_message'] = subsession.get_end_message()
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):
             data['links']['next_subsession'] = {
                 'href': base_url + '/sessions/' + str(session_id) + '/steps/' + str(step) + '/subsessions/' + str(subsession_id + 1),

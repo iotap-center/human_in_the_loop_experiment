@@ -1,8 +1,19 @@
 let step_duration = 5000;
 let timer = null;
 
+const welcomeMessage = `
+<p>Thank you for agreeing to participate in this research experiment on interactive machine learning! During the experiment you will need to give your full attention to the task at hand, so we ask that you follow these instructions carefully. The data collected is done anonymously. Because of this, if the tab with your session is closed and you click on the link again to reopen, a new session will be started, i.e. your previous answers will not be saved.</p>
+<p>Multiple sequences of images will be displayed. You are asked to provide input regarding whether the image contains cats or dogs to gradually improve the system. If a prediction is made by the system, it will be visible to you by the button with the prediction being preselected. If you do not change this pre-chosen label, it will be sent to the system as feedback. The experiment consists of different parts. After each part there is a break before the next part starts. The total time of this experiment will be 15 minutes.</p>
+<p>In the first part you will see 1 image at a time and you will have 3 seconds to provide input.</p>
+<p>If you have any questions regarding the experiment before you start or after, you are welcome to contact Agnes at agnes.tegen@mau.se .</p>
+<p>Thank you again for your participation!</p>
+<p>Agnes Tegen, Paul Davidsson and Jan Persson</p>
+`;
+
 // Setup
-$( function() {
+$( async function() {
+  await showMessageAndAwaitGo(welcomeMessage)
+  .then(hideMessageAndStart);
   createNewSession()
     .then(fetchSteps)
     .then(fetchStep)
@@ -99,8 +110,8 @@ const prepareNextStep = async function (data) {
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
-    clearImages();
-    await showMessageAndAwaitGo();
+    await showMessageAndAwaitGo(data.end_message)
+      .then(hideMessageAndStart);
     putSubsessionStep(compileResponses(), data.links.update)
       .then(result => fetchSubsession(data.links.next_subsession))
       .then(fetchSubsessionStep)
@@ -186,23 +197,29 @@ const sleep = function (duration) {
   return new Promise(resolve => setTimeout(resolve, duration));
 };
 
-const showMessageAndAwaitGo = async function() {
+const hideMessageAndStart = async function() {
+  const wrapper = document.getElementById("wrapper");
+    wrapper.style.visibility = "visible";
+
+    const splashMessage = document.getElementById("splash_message");
+    splashMessage.style.visibility = "hidden";
+};
+
+const showMessageAndAwaitGo = async function(message) {
   return new Promise((resolve, reject) => {
     const wrapper = document.getElementById("wrapper");
-  
-    // Yes, this is an ugly hack. We do this to avoid
-    // doing stuff to the css, because we're lazy
-    wrapper.appendChild(document.createElement("div"));
-    wrapper.appendChild(document.createElement("div"));
-    wrapper.appendChild(document.createElement("div"));
-    wrapper.appendChild(document.createElement("div"));
+    wrapper.style.visibility = "hidden";
+
+    const splashMessage = document.getElementById("splash_message");
+    splashMessage.style.visibility = "visible";
+    splashMessage.innerHTML = "";
   
     const infoContainer = document.createElement("div");
     infoContainer.classList.add("info-container")
-    wrapper.appendChild(infoContainer);
+    splashMessage.appendChild(infoContainer);
   
     const infoText = document.createElement("p");
-    infoText.innerHTML = "Time for a pause! Let us know when you're ready for the next step.";
+    infoText.innerHTML = message;
     infoContainer.appendChild(infoText);
   
     const nextButton = document.createElement("button");

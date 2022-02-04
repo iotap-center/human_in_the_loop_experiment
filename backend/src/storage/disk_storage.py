@@ -24,7 +24,6 @@ class DiskStorage:
         sessions = list()
         
         for file in os.listdir(self.__sessions_path):
-            print(file)
             if file.endswith(".full.pickle"):
                 sessions.append(uuid.UUID(file[0:file.find(".")]))
 

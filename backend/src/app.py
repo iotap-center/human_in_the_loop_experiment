@@ -32,7 +32,6 @@ def serve_scripts(script: str):
 def serve_styles(style: str):
     return send_from_directory(frontend_base + '/styles', style)
 
-# TODO: Byt ut mot CDN
 @app.route('/images/<string:image>', methods=['GET'])
 def serve_images(image: str):
     return send_from_directory(image_directory, image)

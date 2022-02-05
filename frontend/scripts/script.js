@@ -12,7 +12,7 @@ const welcomeMessage = `
 
 // Setup
 $( async function() {
-  await showMessageAndAwaitGo(welcomeMessage)
+  await showMessageAndAwaitGo({end_message: welcomeMessage})
   .then(hideMessageAndStart);
   createNewSession()
     .then(fetchSteps)
@@ -110,15 +110,15 @@ const prepareNextStep = async function (data) {
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
-    putSubsessionStep(compileResponses(), data.links.update)
+    await putSubsessionStep(compileResponses(), data.links.update)
+      .then(showMessageAndAwaitGo)
+      .then(hideMessageAndStart)
       .then(result => fetchSubsession(data.links.next_subsession))
       .then(fetchSubsessionStep)
       .then(presentSubsessionStep)
-      .then(result => showMessageAndAwaitGo(data.end_message))
-      .then(hideMessageAndStart)
       .then(prepareNextStep);
   } else {
-    showMessageAndAwaitGo(data.end_message)
+    showMessageAndAwaitGo(data)
       .then(justLog(""));
   }
 };
@@ -200,15 +200,18 @@ const sleep = function (duration) {
   return new Promise(resolve => setTimeout(resolve, duration));
 };
 
-const hideMessageAndStart = async function() {
-  const wrapper = document.getElementById("wrapper");
+const hideMessageAndStart = async function(data) {
+  return new Promise((resolve, reject) => {
+    const wrapper = document.getElementById("wrapper");
     wrapper.style.visibility = "visible";
 
     const splashMessage = document.getElementById("splash_message");
     splashMessage.style.visibility = "hidden";
+    resolve(data);
+  });
 };
 
-const showMessageAndAwaitGo = async function(message) {
+const showMessageAndAwaitGo = function(data) {
   return new Promise((resolve, reject) => {
     clearImages();
     const wrapper = document.getElementById("wrapper");
@@ -223,7 +226,7 @@ const showMessageAndAwaitGo = async function(message) {
     splashMessage.appendChild(infoContainer);
   
     const infoText = document.createElement("p");
-    infoText.innerHTML = message;
+    infoText.innerHTML = data.end_message;
     infoContainer.appendChild(infoText);
   
     const nextButton = document.createElement("button");
@@ -315,7 +318,7 @@ const addImage = function (imageURL, image, stream, prediction, classes, query) 
       fieldset.appendChild(label);
       fieldset.appendChild(input);
     }
-  } else {
-    rootDiv.innerHTML = "[No image in this step]";
+  //} else {
+  //  rootDiv.innerHTML = "[No image in this step]";
   }
 };

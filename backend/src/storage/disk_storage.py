@@ -70,6 +70,10 @@ class DiskStorage:
     def save_subsession(self, subsession: Subsession) -> None:
         filename = self.__create_filename(str(subsession.get_session().get_id()), subsession.get_session_step(), subsession.get_strategy(), 'results')
         pickle.dump(subsession.serialize(), open(filename, 'wb'))
+
+    def save_results(self, subsession: Subsession) -> None:
+        filename = self.__create_filename(str(subsession.get_session().get_id()), subsession.get_session_step() + 1, subsession.get_strategy(), 'results')
+        pickle.dump(subsession.serialize_results(), open(filename, 'wb'))
     
     def __save_session(self, session: Session) -> None:
         filename = self.__create_filename(session_id = str(session.get_id()), object_type = 'full')

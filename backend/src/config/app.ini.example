@@ -18,3 +18,7 @@ step_duration = 5
 subsession_pause_duration = 0
 
 [aws]
+bucket = bucket-name
+region = eu-north-1
+access_key = <your access key>
+secret_access_key = <your secret key>

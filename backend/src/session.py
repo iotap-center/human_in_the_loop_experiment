@@ -94,8 +94,7 @@ class Stream:
                 [image_id: str,
                  y_true: int,
                  prediction: int,
-                 user_input: int,
-                 query: bool]
+                 user_input: int]
         """
         self.__results[result[0]] = result
 
@@ -121,6 +120,9 @@ class Stream:
             return self.__results[image_id]
         except:
             return None
+    
+    def serialize_results(self) -> list:
+        return list(self.__results.values())
 
     def size(self) -> int:
         return len(self.__images)
@@ -253,6 +255,12 @@ class Subsession:
     def nbr_of_streams(self) -> int:
         """Returns the number of streams in this subsession."""
         return len(self.__streams)
+    
+    def serialize_results(self) -> list:
+        results = list()
+        for stream in self.__streams:
+            results = results + stream.serialize_results()
+        return results
 
     def serialize(self) -> dict:
         """Converts this subsession object to a dictionary. Returns None if unsuccessful."""

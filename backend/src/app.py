@@ -14,7 +14,7 @@ base_url: str = config['api']['base_url']
 frontend_base: str = config['frontend']['frontend_base']
 image_base: str = config['frontend']['image_base']
 image_directory: str = config['frontend']['image_directory']
-storage: Storage = Storage.create_storage("disk")
+storage: Storage = Storage.create_storage('aws')
 backend = main_BE
 
 step_duration: int = int(config['frontend']['step_duration'])
@@ -380,7 +380,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
             'method': 'GET'
         }
     else:
-        storage.save_subsession(subsession)
+        storage.save_results(subsession)
         data['timeout'] = subsession_pause_duration
         data['end_message'] = subsession.get_end_message()
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):

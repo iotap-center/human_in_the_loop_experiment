@@ -1,6 +1,7 @@
 from session import Session, Subsession
 from storage.disk_storage import DiskStorage
 from storage.memory_storage import MemoryStorage
+from storage.s3_storage import S3Storage
 import uuid
 
 # This is an ugly hack used to  satisfy some internal dependencies
@@ -32,9 +33,20 @@ class Storage:
     def save_subsession(self, subsession: Subsession) -> None:
         self.__backend.save_subsession(subsession)
 
+    def save_results(self, subsession: Subsession) -> None:
+        self.__backend.save_results(subsession)
+
     @classmethod
     def create_storage(cls, backend: str) -> Storage:
+        """Creates a storage object with a specified backend.
+        
+        Keyword arguments:
+        backend -- 'disk' for local storage, 'aws' for S3 bucket storage,
+                    anything else will result in temporary in-memory storage.
+        """
         if backend == 'disk':
             return Storage(DiskStorage())
+        elif backend == 'aws':
+            return Storage(S3Storage())
         else:
             return Storage(MemoryStorage())

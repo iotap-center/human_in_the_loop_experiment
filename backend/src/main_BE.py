@@ -158,6 +158,6 @@ def update(
 
     # update result data
     # add time????
-    subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input, query])
+    subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input])
 
     return subsession

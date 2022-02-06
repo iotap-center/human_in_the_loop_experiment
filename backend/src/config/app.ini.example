@@ -1,3 +1,7 @@
+[app]
+mode = production | development
+port = 80
+
 [backend]
 data_path = data/
 data_features_name = features.pickle

@@ -1,3 +1,4 @@
+from waitress import serve
 from flask import Flask, jsonify, request, send_from_directory, abort
 from session import Session, Subsession
 from storage.storage import Storage
@@ -9,6 +10,8 @@ import main_BE
 app = Flask(__name__)
 config = configparser.ConfigParser()
 config.read('config/app.ini')
+mode=config['app']['mode']
+port=config['app']['port']
 
 base_url: str = config['api']['base_url']
 frontend_base: str = config['frontend']['frontend_base']
@@ -396,3 +399,10 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         
         
     return jsonify(data)
+
+
+if __name__ == '__main__':
+    if mode == 'development':
+        app.run(port=port)
+    elif mode == 'production':
+        serve(app, port=port)

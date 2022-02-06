@@ -11,6 +11,7 @@ app = Flask(__name__)
 config = configparser.ConfigParser()
 config.read('config/app.ini')
 mode=config['app']['mode']
+host=config['app']['host']
 port=config['app']['port']
 
 base_url: str = config['api']['base_url']
@@ -403,6 +404,6 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
 
 if __name__ == '__main__':
     if mode == 'development':
-        app.run(port=port)
+        app.run(host=host, port=port)
     elif mode == 'production':
-        serve(app, port=port)
+        serve(app, host=host, port=port)

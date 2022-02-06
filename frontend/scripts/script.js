@@ -118,8 +118,8 @@ const prepareNextStep = async function (data) {
       .then(presentSubsessionStep)
       .then(prepareNextStep);
   } else {
-    showMessageAndAwaitGo(data)
-      .then(justLog(""));
+    putSubsessionStep(compileResponses(), data.links.update)
+      .then(showMessageAndStop);
   }
 };
 
@@ -235,6 +235,24 @@ const showMessageAndAwaitGo = function(data) {
     nextButton.onclick = resolve;
     infoContainer.appendChild(nextButton);
   });
+};
+
+const showMessageAndStop = function(data) {
+  clearImages();
+  const wrapper = document.getElementById("wrapper");
+  wrapper.style.visibility = "hidden";
+
+  const splashMessage = document.getElementById("splash_message");
+  splashMessage.style.visibility = "visible";
+  splashMessage.innerHTML = "";
+
+  const infoContainer = document.createElement("div");
+  infoContainer.classList.add("info-container")
+  splashMessage.appendChild(infoContainer);
+
+  const infoText = document.createElement("p");
+  infoText.innerHTML = data.end_message;
+  infoContainer.appendChild(infoText);
 };
 
 const themeRadioButtons = function () {

@@ -2,12 +2,12 @@ let step_duration = 5000;
 let timer = null;
 
 const welcomeMessage = `
-<p>Thank you for agreeing to participate in this research experiment on interactive machine learning! During the experiment you will need to give your full attention to the task at hand, so we ask that you follow these instructions carefully. The data collected is done anonymously. Because of this, if the tab with your session is closed and you click on the link again to reopen, a new session will be started, i.e. your previous answers will not be saved.</p>
-<p>Multiple sequences of images will be displayed. You are asked to provide input regarding whether the image contains cats or dogs to gradually improve the system. If a prediction is made by the system, it will be visible to you by the button with the prediction being preselected. If you do not change this pre-chosen label, it will be sent to the system as feedback. The experiment consists of different parts. After each part there is a break before the next part starts. The total time of this experiment will be 15 minutes.</p>
-<p>In the first part you will see 1 image at a time and you will have 3 seconds to provide input.</p>
-<p>If you have any questions regarding the experiment before you start or after, you are welcome to contact Agnes at agnes.tegen@mau.se .</p>
-<p>Thank you again for your participation!</p>
-<p>Agnes Tegen, Paul Davidsson and Jan Persson</p>
+<p>Thank you for agreeing to participate in this experiment on interactive machine learning!</p>
+<p>During the experiment you will need to give your full attention to the task at hand. The data collected is done anonymously. Because of this, it is important that you don’t close the window (or tab) until the experiment is completely finished.</p>
+<p>Your task is to teach the system to recognize cats and dogs. You will be shown images and are asked to tell the system whether the images contain cats or dogs by clicking a button. In some cases, the system has already made a guess and then one button is preselected. If you think that the guess is correct, you do not have to do anything.</p>
+<p>Please use a web browser on a computer and not your mobile phone for these experiments. The experiment consists of different parts. After each part there is a break before the next part starts. For each part the number of images will increase. Even if you do not have time to annotate all, please continue. The total time of the experiment will be about 20-25 minutes.</p>
+<p>In the first part of the experiment you will see 1 image at a time and you will have 3 seconds to provide input.</p>
+<p>If you have any questions regarding the experiment before you start or after, you are welcome to contact Agnes at <a href="mailto:agnes.tegen@mau.se">agnes.tegen@mau.se</a></p>
 `;
 
 // Setup
@@ -336,7 +336,7 @@ const addImage = function (imageURL, image, stream, prediction, classes, query) 
       fieldset.appendChild(label);
       fieldset.appendChild(input);
     }
-  //} else {
-  //  rootDiv.innerHTML = "[No image in this step]";
+  } else {
+    rootDiv.innerHTML = "[Image not displayed]";
   }
 };

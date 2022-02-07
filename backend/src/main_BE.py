@@ -48,7 +48,7 @@ def create_session(nbr_of_steps: int = 0, nbr_of_images: int = 0) -> Session:
     
     # Step 4
     session.add_subsession(3, create_subsession(session, 3, Strategy.MT, 9, nbr_of_images, "In the next part you will see 9 images at a time again, but the images will not be displayed all the time (when it is not displayed you cannot provide feedback)."));
-    session.add_subsession(3, create_subsession(session, 3, Strategy.ALMT, 9, nbr_of_images, "That was the last part, thank you for your participation in the experiments!"));
+    session.add_subsession(3, create_subsession(session, 3, Strategy.ALMT, 9, nbr_of_images, "<p>That was the last part, thank you for your participation in the experiments!</p><p>Agnes Tegen, Paul Davidsson and Jan Persson</p>"));
     
     return session
 

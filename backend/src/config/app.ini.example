@@ -11,6 +11,7 @@ sessions_path = session_data/
 results_path = results/
 default_nbr_of_steps = 4
 default_nbr_of_images = 30
+labels = cat,dog
 
 [api]
 base_url = /api/v1

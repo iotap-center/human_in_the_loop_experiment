@@ -23,6 +23,7 @@ backend = main_BE
 
 step_duration: int = int(config['frontend']['step_duration'])
 subsession_pause_duration: int = int(config['frontend']['subsession_pause_duration'])
+labels: list = config['backend']['labels'].split(',')
 
 @app.route('/', methods=['GET'])
 def serve_frontend():
@@ -283,7 +284,7 @@ def get_subsession_step(session_id: uuid, step: int, subsession_id: int, sub_ste
             'stream': index + 1,
             'image': image,
             'classification': classification[2],
-            'labels': ['cat', 'dog'], # TODO: Change to real values!
+            'labels': labels,
             'image_url': image_base + image,
             'query': classification[3]
         }
@@ -369,7 +370,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
                 'stream': index + 1,
                 'image': image,
                 'classification': images[image]['classification'],
-                'labels': ['cat', 'dog'], # TODO: Change to real values!
+                'labels': labels,
                 'image_url': image_base + image,
                 'query': bool(images[image]['query'])
             }

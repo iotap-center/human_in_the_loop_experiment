@@ -120,9 +120,17 @@ class Stream:
             return self.__results[image_id]
         except:
             return None
-    
-    def serialize_results(self) -> list:
-        return list(self.__results.values())
+
+    def serialize_results(self) -> dict:
+        """Serializes the result dicts to a format better suited to data analysis"""
+        results: dict = dict()
+        pos: int = 0
+
+        for result in list(self.__results.values()):
+            results[pos] = result
+            pos += 1
+
+        return results
 
     def size(self) -> int:
         return len(self.__images)
@@ -256,10 +264,12 @@ class Subsession:
         """Returns the number of streams in this subsession."""
         return len(self.__streams)
     
-    def serialize_results(self) -> list:
-        results = list()
+    def serialize_results(self) -> dict:
+        results: dict = dict()
+        pos: int = 0
         for stream in self.__streams:
-            results = results + stream.serialize_results()
+            results[pos] = stream.serialize_results()
+            pos += 1
         return results
 
     def serialize(self) -> dict:
@@ -342,7 +352,7 @@ class Session:
         step_id -- The step where we want to put the subsession
         subsession -- The subsession we want to add
         """
-        self.__steps[step_id].insert(subsession.get_session_step(), subsession)
+        self.__steps[step_id].append(subsession)
 
     def get_step(self, step_id: int) -> list:
         """Returns a list of subsession objects. If not found, None is returned.

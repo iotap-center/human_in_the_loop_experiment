@@ -146,7 +146,7 @@ def update(
     query -- Tells whether the model should be updated or not. If false, the
     result will just be recorded.
     """
-    if query:
+    if query and user_input > -1:
         # load correct model
         model = subsession.get_stream(stream_id).get_model()
 
@@ -156,7 +156,6 @@ def update(
         subsession.get_stream(stream_id).set_model(model)
 
     # update result data
-    # add time????
-    subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input])
+    subsession.get_stream(stream_id).add_result([image_id, y_true, prediction, user_input, query])
 
     return subsession

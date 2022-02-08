@@ -358,24 +358,23 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     for index in range(subsession.nbr_of_streams()):
         image = subsession.get_stream(index).get_image(be_sub_step)
         sample = utils.load_data_sample(image)
-        if image in images:
-            subsession = backend.update(subsession,
-                index,
-                image,
-                sample[1],
-                subsession.get_stream(index).get_prediction(image),
-                images[image]['classification'],
-                bool(images[image]['query']))
-            item = {
-                'stream': index + 1,
-                'image': image,
-                'classification': images[image]['classification'],
-                'labels': labels,
-                'image_url': image_base + image,
-                'query': bool(images[image]['query'])
-            }
-            data['images'].append(item)
-            item = None
+        subsession = backend.update(subsession,
+            index,
+            image,
+            sample[1],
+            subsession.get_stream(index).get_prediction(image),
+            images[image]['classification'],
+            bool(images[image]['query']))
+        item = {
+            'stream': index + 1,
+            'image': image,
+            'classification': images[image]['classification'],
+            'labels': labels,
+            'image_url': image_base + image,
+            'query': bool(images[image]['query'])
+        }
+        data['images'].append(item)
+        item = None
     
     if sub_step < subsession.get_stream(0).size():
         data['timeout'] = step_duration
@@ -386,7 +385,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         }
     else:
         storage.save_results(subsession)
-        storage.update_session(session)
+        #storage.update_session(session)
         data['timeout'] = subsession_pause_duration
         data['end_message'] = subsession.get_end_message()
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):

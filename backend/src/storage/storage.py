@@ -15,6 +15,9 @@ class Storage:
     def add_session(self, session: Session) -> None:
         self.__backend.add_session(session)
 
+    def update_session(self, session: Session) -> None:
+        self.__backend.update_session(session)
+
     def list_sessions(self) -> list:
         return self.__backend.list_sessions()
 

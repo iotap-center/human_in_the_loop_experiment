@@ -386,6 +386,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
         }
     else:
         storage.save_results(subsession)
+        storage.update_session(session)
         data['timeout'] = subsession_pause_duration
         data['end_message'] = subsession.get_end_message()
         if (subsession_id < session.nbr_of_subsessions_in_step(be_step)):

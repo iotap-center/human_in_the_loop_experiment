@@ -24,8 +24,10 @@ class S3Storage:
 
     def add_session(self, session: Session) -> None:
         self.__cache.add_session(session)
-        obj = self.__resource.Object(self.__bucket, self.__sessions_path + str(session.get_id()) + '.pickle')
-        obj.put(Body=pickle.dumps(session))
+        self.__save_session(session)
+    
+    def update_session(self, session: Session) -> None:
+        self.__save_session(session)
 
     def list_sessions(self) -> list:
         sessions: list = list()
@@ -93,6 +95,10 @@ class S3Storage:
         json_filename = self.__create_filename(subsession, 'results', 'json')
         json_file = self.__resource.Object(self.__bucket, json_filename)
         json_file.put(Body=json.dumps(subsession.serialize_results()))
+
+    def __save_session(self, session: Session) -> None:
+        obj = self.__resource.Object(self.__bucket, self.__sessions_path + str(session.get_id()) + '.pickle')
+        obj.put(Body=pickle.dumps(session))
 
     def __create_filename(self,
             subsession: Subsession = None,

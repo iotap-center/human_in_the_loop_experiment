@@ -18,9 +18,11 @@ class DiskStorage:
     def add_session(self, session: Session) -> None:
         self.__cache.add_session(session)
         self.__save_session(session)
+    
+    def update_session(self, session: Session) -> None:
+        self.__save_session(session)
 
     def list_sessions(self) -> list:
-        # TODO: list sessions on disk
         sessions = list()
         
         for file in os.listdir(self.__sessions_path):

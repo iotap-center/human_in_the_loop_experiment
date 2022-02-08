@@ -4,6 +4,7 @@ host = 0.0.0.0
 port = 80
 
 [backend]
+storage_backend = aws | disk
 data_path = data/
 data_features_name = features.pickle
 im_indices_name = im_indicies.pickle

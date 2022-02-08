@@ -18,7 +18,7 @@ base_url: str = config['api']['base_url']
 frontend_base: str = config['frontend']['frontend_base']
 image_base: str = config['frontend']['image_base']
 image_directory: str = config['frontend']['image_directory']
-storage: Storage = Storage.create_storage('aws')
+storage: Storage = Storage.create_storage(config['backend']['storage_backend'])
 backend = main_BE
 
 step_duration: int = int(config['frontend']['step_duration'])

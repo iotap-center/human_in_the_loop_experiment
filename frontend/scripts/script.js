@@ -338,5 +338,12 @@ const addImage = function (imageURL, image, stream, prediction, classes, query) 
     }
   } else {
     rootDiv.innerHTML = "[Image not displayed]";
+    const fieldset = document.createElement("fieldset");
+    fieldset.classList.add("grid-container");
+    rootDiv.appendChild(fieldset);
+    
+    fieldset.appendChild(createHiddenInput("image", image));
+    fieldset.appendChild(createHiddenInput("stream", stream));
+    fieldset.appendChild(createHiddenInput("query", query));
   }
 };

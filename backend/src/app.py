@@ -358,7 +358,7 @@ def update_subsession_step(session_id: uuid, step: int, subsession_id: str, sub_
     for index in range(subsession.nbr_of_streams()):
         image = subsession.get_stream(index).get_image(be_sub_step)
         sample = utils.load_data_sample(image)
-        if image in images and images[image]['classification'] >= 0:
+        if image in images:
             subsession = backend.update(subsession,
                 index,
                 image,

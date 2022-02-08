@@ -9,7 +9,6 @@ data_features_name = features.pickle
 im_indices_name = im_indicies.pickle
 sessions_path = session_data/
 results_path = results/
-default_nbr_of_steps = 4
 default_nbr_of_images = 30
 labels = cat,dog
 

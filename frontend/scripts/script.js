@@ -105,11 +105,13 @@ const justFetch = function (link) {
 const prepareNextStep = async function (data) {
   await sleep(step_duration);
   if (data.links.next) {
+    grayOut("Processing input");
     putSubsessionStep(compileResponses(), data.links.update)
         .then(result => fetchSubsessionStep(data.links.next))
         .then(presentSubsessionStep)
         .then(prepareNextStep);
   } else if (data.links.next_subsession) {
+    grayOut("Processing input");
     await putSubsessionStep(compileResponses(), data.links.update)
       .then(showMessageAndAwaitGo)
       .then(hideMessageAndStart)
@@ -142,6 +144,7 @@ const putSubsessionStep = function (compilation, link) {
 };
 
 const presentSubsessionStep = function (data) {
+  unmodalize();
   return new Promise( (resolve, reject) => {
     step_duration = data.timeout * 1000;
     setupForm(data);
@@ -213,6 +216,7 @@ const hideMessageAndStart = async function(data) {
 
 const showMessageAndAwaitGo = function(data) {
   return new Promise((resolve, reject) => {
+    unmodalize();
     clearImages();
     const wrapper = document.getElementById("wrapper");
     wrapper.style.visibility = "hidden";
@@ -238,6 +242,7 @@ const showMessageAndAwaitGo = function(data) {
 };
 
 const showMessageAndStop = function(data) {
+  unmodalize();
   clearImages();
   const wrapper = document.getElementById("wrapper");
   wrapper.style.visibility = "hidden";
@@ -253,6 +258,35 @@ const showMessageAndStop = function(data) {
   const infoText = document.createElement("p");
   infoText.innerHTML = data.end_message;
   infoContainer.appendChild(infoText);
+};
+
+const grayOut = function(message) {
+  const splashMessage = document.getElementById("splash_message");
+  splashMessage.innerHTML = "";
+
+  const infoContainer = document.createElement("div");
+  infoContainer.classList.add("info-container")
+  splashMessage.appendChild(infoContainer);
+
+  const infoText = document.createElement("p");
+  infoText.innerHTML = message;
+  infoContainer.appendChild(infoText);
+
+  modalize();
+};
+
+const modalize = function () {
+  const splashMessage = document.getElementById("splash_message");
+  splashMessage.style.visibility = "visible";
+  splashMessage.classList.add("modal")
+  splashMessage.click = (e) => { e.stopPropagation(); };
+};
+
+const unmodalize = function () {
+  const splashMessage = document.getElementById("splash_message");
+  splashMessage.style.visibility = "hidden";
+  splashMessage.classList.remove("modal")
+  splashMessage.click = null;
 };
 
 const themeRadioButtons = function () {

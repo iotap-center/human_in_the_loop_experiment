@@ -24,6 +24,11 @@ fieldset {
   height: 100%;
 }
 
+.modal {
+  font-size: xx-large;
+  background-color: rgba(100, 100, 100, 0.8);
+}
+
 .grid-item {
   padding: 10px;
   font-size: 20pt;

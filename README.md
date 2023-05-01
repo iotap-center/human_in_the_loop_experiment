@@ -1,7 +1,15 @@
 # About this project
-This is a human-in-the-loop experiment. That's it.
+
+This is a human-in-the-loop experiment on interactive machine learning.
+
+## Attribution
+
+If you're using our software in your research, please cite:
+
+> Agnes Tegen, Paul Davidsson, and Jan A. Persson. 'Human Factors', in *Interactive Online Machine Learning, 2nd International Conference of Hybrid Human-Artificial Intelligence*, June 26-30, 2023, Munich, Germany.
 
 ## Installation and execution
+
 This guide is written for Linux/macOS. Running on Windows should be trivial. Make sure that you're running Python 3.6 or later.
 
 ### Installation
